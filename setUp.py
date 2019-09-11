@@ -6,7 +6,6 @@ import random
     Classe SetUp: gestisce l'accesso al DB
         - instance: attributo che contiene l'istanza del DB (inizialmente è una stringa vuota)
 '''
-
 class SetUp:
     instance = ' '
 

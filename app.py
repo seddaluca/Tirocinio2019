@@ -1,5 +1,6 @@
 import firebase as firebase
 from flask import Flask, request, make_response, jsonify
+from datetime import date
 
 import random
 
@@ -8,8 +9,6 @@ from setUp import SetUp
 
 # initialize the flask app
 app = Flask(__name__)
-
-
 
 # default route
 @app.route('/')
@@ -40,84 +39,64 @@ def webhook():
 
 def response(action):
 
-    responseList = ['I suggest you ',
-                    'I recommend you ']
+    responseList = ['I suggest you',
+                    'I recommend you']
 
-    response = responseList[random.randint(0,1)] # imposto la risposta di default
+    response = responseList[random.randint(0, 1)] + ' - ' + str(date.today()) + ' - '# imposto la risposta di default
 
     typeOfMeal = action.get('parameters').get('TypeOfMeal')
 
+    print(str(date.today().isocalendar()[1]))
+
     firebaseList = {
-        "first dishes" : [ {
-            "calories" : 200,
-            "name" : "Vegetagle Soup"
+        "first dishes": [{
+            0: {"take": 2, "calories": 200, "name": "Vegetagle Soup"}
         }, {
-            "calories" : 250,
-            "name" : "Vegetable couscous"
+            1: {"take": 2, "calories": 250, "name": "Vegetable couscous"}
         }, {
-            "calories" : 350,
-            "name" : "Pasta with artichokes"
+            2: {"take": 2, "calories": 350, "name": "Pasta with artichokes"}
         }, {
-            "calories" : 230,
-            "name" : "Mushroom and Potato Soup"
+            3: {"take": 2, "calories": 230, "name": "Mushroom and Potato Soup"}
         }, {
-            "calories" : 210,
-            "name" : "Cream of Pumpkin"
+            4: {"take": 2, "calories": 210, "name": "Cream of Pumpkin"}
         }, {
-            "calories" : 360,
-            "name" : "Ricotta Pasta"
+            5: {"take": 2, "calories": 360, "name": "Ricotta Pasta"}
         }, {
-            "calories" : 360,
-            "name" : "Tagliatelle with Mushrooms"
+            6: {"take": 2, "calories": 360, "name": "Tagliatelle with Mushrooms"}
         }, {
-            "calories" : 375,
-            "name" : "Spaghetti with Garlic and Oil"
+            7: {"take": 2, "calories": 375, "name": "Spaghetti with Garlic and Oil"}
         }, {
-            "calories" : 385,
-            "name" : "Gnocchi with Tomato Sauce"
-        } ],
+            8: {"take": 2, "calories": 385, "name": "Gnocchi with Tomato Sauce"}
+        }],
 
-        "fruit" : [ {
-            "calories" : 89,
-            "name" : "banana"
+        "fruit" : [{
+            0: {"take": 2, "calories": 89, "name": "banana"}
         }, {
-            "calories" : 52,
-            "name" : "apple"
+            1: {"take": 2, "calories": 52, "name": "apple"}
         }, {
-            "calories" : 57,
-            "name" : "pear"
-        } ],
+            2: {"take": 2, "calories": 57, "name": "pear"}
+        }],
 
-        "second dishes" : [ {
-            "calories" : 290,
-            "name" : "Grilled Lamb Chops"
+        "second dishes" : [{
+            0: {"take": 2, "calories": 290, "name": "Grilled Lamb Chops"}
         }, {
-            "calories" : 185,
-            "name" : "Hard Boiled Eggs"
+            1: {"take": 2, "calories": 185, "name": "Hard Boiled Eggs"}
         }, {
-            "calories" : 200,
-            "name" : "Grilled Pork Chops"
+            2: {"take": 2, "calories": 200, "name": "Grilled Pork Chops"}
         }, {
-            "calories" : 220,
-            "name" : "Paprika Chicken Legs"
+            3: {"take": 2, "calories": 220, "name": "Paprika Chicken Legs"}
         }, {
-            "calories" : 250,
-            "name" : "Sea Bass in Salt Crust"
+            4: {"take": 2, "calories": 250, "name": "Sea Bass in Salt Crust"}
         }, {
-            "calories" : 270,
-            "name" : "Pan-Fried Chicken"
-        } ],
+            5: {"take": 2, "calories": 270, "name": "Pan-Fried Chicken"}
+        }],
 
-        "side dishes" : [ {
-            "calories" : 77,
-            "name" : "potato"
+        "side dishes": [{
+            0: {"take": 2, "calories": 77, "name": "potato"}
         }, {
-            "calories" : 18,
-            "name" : "tomato"
-        } ]
+            1: {"take": 2, "calories": 18, "name": "tomato"}
+        }]
     }
-
-    print(firebaseList)
 
     listFirstDishes = firebaseList.get('first dishes')
     listSecondDishes = firebaseList.get('second dishes')
@@ -134,12 +113,10 @@ def response(action):
     sideDishes = random.randint(0, lenListSideDishes)
     fruit = random.randint(0, lenListFruit)
 
-    elementFirstDishes = listFirstDishes.pop(firstDishes)
-    elementSecondDishes = listSecondDishes.pop(secondDishes)
-    elementSideDishes = listSideDishes.pop(sideDishes)
-    elementFruit = listFruit.pop(fruit)
-
-    # Insiemi per test
+    elementFirstDishes = listFirstDishes.__getitem__(firstDishes).get(firstDishes)
+    elementSecondDishes = listSecondDishes.__getitem__(secondDishes).get(secondDishes)
+    elementSideDishes = listSideDishes.__getitem__(sideDishes).get(sideDishes)
+    elementFruit = listFruit.__getitem__(fruit).get(fruit)
 
     list = {'meal': 'meal',
             'single dish': ['first',
