@@ -2,8 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="d667584a-6d6f-45f4-a7e7-04c14e759053" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/37First.txt" beforeDir="false" afterPath="$PROJECT_DIR$/37First.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/37Fruit.txt" beforeDir="false" afterPath="$PROJECT_DIR$/37Fruit.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/37Second.txt" beforeDir="false" afterPath="$PROJECT_DIR$/37Second.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/37Side.txt" beforeDir="false" afterPath="$PROJECT_DIR$/37Side.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/app.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -20,11 +22,12 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/app.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="300">
-              <caret line="303" column="36" lean-forward="true" selection-start-line="303" selection-start-column="36" selection-end-line="303" selection-end-column="36" />
+            <state relative-caret-position="91">
+              <caret line="41" column="47" selection-start-line="41" selection-start-column="47" selection-end-line="41" selection-end-column="47" />
               <folding>
                 <element signature="e#0#27#0" expanded="true" />
                 <element signature="e#2393#2409#0" />
+                <element signature="e#9097#11416#1" />
               </folding>
             </state>
           </provider>
@@ -174,12 +177,12 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1568140743961</updated>
-      <workItem from="1568140745512" duration="31425000" />
+      <workItem from="1568140745512" duration="33052000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="31425000" />
+    <option name="totallyTimeSpent" value="33052000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="23" width="1680" height="981" extended-state="6" />
@@ -248,16 +251,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/setUp.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="375">
-          <caret line="25" column="20" selection-start-line="25" selection-start-column="20" selection-end-line="25" selection-end-column="20" />
-          <folding>
-            <element signature="e#0#29#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$APPLICATION_HOME_DIR$/helpers/pydev/_pydev_bundle/pydev_import_hook.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="203">
@@ -272,16 +265,13 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/37Fruit.txt">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/37Second.txt">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/37Side.txt">
+    <entry file="file://$PROJECT_DIR$/setUp.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="30">
-          <caret line="2" lean-forward="true" selection-start-line="2" selection-end-line="2" />
+        <state relative-caret-position="375">
+          <caret line="25" column="20" selection-start-line="25" selection-start-column="20" selection-end-line="25" selection-end-column="20" />
+          <folding>
+            <element signature="e#0#29#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -292,13 +282,27 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/37Fruit.txt">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/37Side.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="30">
+          <caret line="2" lean-forward="true" selection-start-line="2" selection-end-line="2" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/37Second.txt">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
     <entry file="file://$PROJECT_DIR$/app.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="300">
-          <caret line="303" column="36" lean-forward="true" selection-start-line="303" selection-start-column="36" selection-end-line="303" selection-end-column="36" />
+        <state relative-caret-position="91">
+          <caret line="41" column="47" selection-start-line="41" selection-start-column="47" selection-end-line="41" selection-end-column="47" />
           <folding>
             <element signature="e#0#27#0" expanded="true" />
             <element signature="e#2393#2409#0" />
+            <element signature="e#9097#11416#1" />
           </folding>
         </state>
       </provider>

@@ -37,6 +37,20 @@ def results():
 @app.route('/webhook', methods=['GET', 'POST'])
 def webhook():
     return make_response(jsonify(results())) # return response
+
+# catResponse(response, str(date.isocalendar(date.today())[1])+'First.txt', listFirstDishes, elementFirstDishes)
+def catResponse(response, file, list, element):
+    value = manage(file, element)
+
+    if value == (None, True):
+        return response + element.get("name") + ' (' + str(
+            element.get("calories")) + ' kcal)'
+    else:
+        element = list.__getitem__(value[0]).get(value[0])
+        return response + element.get("name") + ' (' + str(
+            element.get("calories")) + ' kcal)'
+
+
 # function for manage dataset
 def manage(file, obj):
     try: # file esiste
@@ -176,10 +190,27 @@ def response(action):
 
     if len(typeOfMeal) == 1:
         if list.get('meal') in typeOfMeal:
+            response = catResponse(response,
+                                   str(date.isocalendar(date.today())[1]) + 'First.txt',
+                                   listFirstDishes,
+                                   elementFirstDishes) + ', '
+            response = catResponse(response,
+                                   str(date.isocalendar(date.today())[1]) + 'Second.txt',
+                                   listSecondDishes,
+                                   elementSecondDishes) + ', '
+            response = catResponse(response,
+                                   str(date.isocalendar(date.today())[1]) + 'Side.txt',
+                                   listSideDishes,
+                                   elementSideDishes) + ' and '
+            response = catResponse(response,
+                                   str(date.isocalendar(date.today())[1]) + 'Fruit.txt',
+                                   listFruit,
+                                   elementFruit)
 
+            '''
             # print(str(value) + ' ' + str([value[0]]))
 
-            # response = catResponse(response, str(date.isocalendar(date.today())[1])+'First.txt', listFirstDishes, elementFirstDishes)
+            response = catResponse(response, str(date.isocalendar(date.today())[1])+'First.txt', listFirstDishes, elementFirstDishes)
 
             value = manage(str(date.isocalendar(date.today())[1]) + 'First.txt', elementFirstDishes)
 
@@ -220,96 +251,58 @@ def response(action):
                 elementFruit = listFruit.__getitem__(value[0]).get(value[0])
                 response += elementFruit.get("name") + ' (' + str(
                     elementFruit.get("calories")) + ' kcal)'
+                    
+            '''
 
         if list.get('single dish')[0] in typeOfMeal:
-            value = manage(str(date.isocalendar(date.today())[1]) + 'First.txt', elementFirstDishes)
-
-            if value == (None, True):
-                response += elementFirstDishes.get("name") + ' (' + str(
-                    elementFirstDishes.get("calories")) + ' kcal)'
-            else:
-                elementFirstDishes = listFirstDishes.__getitem__(value[0]).get(value[0])
-                response += elementFirstDishes.get("name") + ' (' + str(
-                    elementFirstDishes.get("calories")) + ' kcal)'
+            response = catResponse(response,
+                                   str(date.isocalendar(date.today())[1]) + 'First.txt',
+                                   listFirstDishes,
+                                   elementFirstDishes)
 
         if list.get('single dish')[1] in typeOfMeal:
-            value = manage(str(date.isocalendar(date.today())[1]) + 'Second.txt', elementSecondDishes)
-
-            if value == (None, True):
-                response += elementSecondDishes.get("name") + ' (' + str(
-                    elementSecondDishes.get("calories")) + ' kcal)'
-            else:
-                elementSecondDishes = listSecondDishes.__getitem__(value[0]).get(value[0])
-                response += elementSecondDishes.get("name") + ' (' + str(
-                    elementSecondDishes.get("calories")) + ' kcal)'
+            response = catResponse(response,
+                                   str(date.isocalendar(date.today())[1]) + 'Second.txt',
+                                   listSecondDishes,
+                                   elementSecondDishes)
 
         if list.get('single dish')[2] in typeOfMeal:
-            value = manage(str(date.isocalendar(date.today())[1]) + 'Side.txt', elementSideDishes)
-
-            if value == (None, True):
-                response += elementSideDishes.get("name") + ' (' + str(
-                    elementSideDishes.get("calories")) + ' kcal)'
-            else:
-                elementSideDishes = listSideDishes.__getitem__(value[0]).get(value[0])
-                response += elementSideDishes.get("name") + ' (' + str(
-                    elementSideDishes.get("calories")) + ' kcal)'
+            response = catResponse(response,
+                                   str(date.isocalendar(date.today())[1]) + 'Side.txt',
+                                   listSideDishes,
+                                   elementSideDishes)
 
         if list.get('single dish')[3] in typeOfMeal:
-            value = manage(str(date.isocalendar(date.today())[1]) + 'Fruit.txt', elementFruit)
-
-            if value == (None, True):
-                response += elementFruit.get("name") + ' (' + str(
-                    elementFruit.get("calories")) + ' kcal)'
-            else:
-                elementFruit = listFruit.__getitem__(value[0]).get(value[0])
-                response += elementFruit.get("name") + ' (' + str(
-                    elementFruit.get("calories")) + ' kcal)'
+            response = catResponse(response,
+                                   str(date.isocalendar(date.today())[1]) + 'Fruit.txt',
+                                   listFruit,
+                                   elementFruit)
 
     if len(typeOfMeal) > 1:
         for i in range(0, len(typeOfMeal)):
             if list.get('single dish')[0] in typeOfMeal[i]:
-                value = manage(str(date.isocalendar(date.today())[1]) + 'First.txt', elementFirstDishes)
-
-                if value == (None, True):
-                    response += elementFirstDishes.get("name") + ' (' + str(
-                        elementFirstDishes.get("calories")) + ' kcal)'
-                else:
-                    elementFirstDishes = listFirstDishes.__getitem__(value[0]).get(value[0])
-                    response += elementFirstDishes.get("name") + ' (' + str(
-                        elementFirstDishes.get("calories")) + ' kcal)'
+                response = catResponse(response,
+                                       str(date.isocalendar(date.today())[1]) + 'First.txt',
+                                       listFirstDishes,
+                                       elementFirstDishes)
 
             if list.get('single dish')[1] in typeOfMeal[i]:
-                value = manage(str(date.isocalendar(date.today())[1]) + 'Second.txt', elementSecondDishes)
-
-                if value == (None, True):
-                    response += elementSecondDishes.get("name") + ' (' + str(
-                        elementSecondDishes.get("calories")) + ' kcal)'
-                else:
-                    elementSecondDishes = listSecondDishes.__getitem__(value[0]).get(value[0])
-                    response += elementSecondDishes.get("name") + ' (' + str(
-                        elementSecondDishes.get("calories")) + ' kcal)'
+                response = catResponse(response,
+                                       str(date.isocalendar(date.today())[1]) + 'Second.txt',
+                                       listSecondDishes,
+                                       elementSecondDishes)
 
             if list.get('single dish')[2] in typeOfMeal[i]:
-                value = manage(str(date.isocalendar(date.today())[1]) + 'Side.txt', elementSideDishes)
-
-                if value == (None, True):
-                    response += elementSideDishes.get("name") + ' (' + str(
-                        elementSideDishes.get("calories")) + ' kcal)'
-                else:
-                    elementSideDishes = listSideDishes.__getitem__(value[0]).get(value[0])
-                    response += elementSideDishes.get("name") + ' (' + str(
-                        elementSideDishes.get("calories")) + ' kcal)'
+                response = catResponse(response,
+                                       str(date.isocalendar(date.today())[1]) + 'Side.txt',
+                                       listSideDishes,
+                                       elementSideDishes)
 
             if list.get('single dish')[3] in typeOfMeal[i]:
-                value = manage(str(date.isocalendar(date.today())[1]) + 'Fruit.txt', elementFruit)
-
-                if value == (None, True):
-                    response += elementFruit.get("name") + ' (' + str(
-                        elementFruit.get("calories")) + ' kcal)'
-                else:
-                    elementFruit = listFruit.__getitem__(value[0]).get(value[0])
-                    response += elementFruit.get("name") + ' (' + str(
-                        elementFruit.get("calories")) + ' kcal)'
+                response = catResponse(response,
+                                       str(date.isocalendar(date.today())[1]) + 'Fruit.txt',
+                                       listFruit,
+                                       elementFruit)
 
             if i == len(typeOfMeal)-2:
                     response += ' and '
