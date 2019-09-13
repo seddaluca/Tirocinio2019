@@ -43,12 +43,37 @@ def manage(file, obj):
         try: # file esiste e contiene minimo una riga
             dataset = pd.read_csv(file, sep=",", error_bad_lines=False)  # Leggo tutto il file
 
-            if obj.get("id") not in dataset["ID"].to_list():
-                dataset = dataset.append(pd.DataFrame({"ID": [obj.get("id")], "Take": [obj.get("take")]}), ignore_index=True)
+            if obj.get("id") not in dataset["ID"].to_list(): # alimento non ancora mangiato nella settimana x
+                dataset = dataset.append(pd.DataFrame({"ID": [obj.get("id")],
+                                                       "Take": [obj.get("take")]}), ignore_index=True)
 
                 dataset.to_csv(index=False, path_or_buf=file)
-            else:
-                print("Elemento già presente")
+            else: # è stato mangiato
+                for i in range(0, len(dataset.index)):
+                    if (obj.get("id") == dataset.iloc[i]["ID"] and int(dataset.iloc[i]["Take"]) > 0):
+                        # se posso assumere ancora l'alimento
+                        print("Decremento la colonna Take per l'elemento "
+                              + str(dataset.iloc[i]["ID"]))
+
+                        dataset.iloc[i]["Take"] -= 1
+
+                        dataset.to_csv(index=False, path_or_buf=file)
+
+                    elif (obj.get("id") == dataset.iloc[i]["ID"] and int(dataset.iloc[i]["Take"]) == 0):
+                        # se non posso assumere l'alimento, cerco l'alimento che posso ancora assumere (max Take)
+                        print("Cercare un nuovo alimento, possibile rimpiazzo: "
+                              + str(dataset.loc[dataset["Take"].idxmax()]))
+
+                        value = dataset.loc[dataset["Take"].idxmax()]
+
+                        for j in range(0, len(dataset.index)): # recupero la riga e decremento Take
+                            if value.loc["ID"] == dataset.iloc[j]["ID"]:
+                                dataset.iloc[j]["Take"] -= 1
+                                break
+
+                        dataset.to_csv(index=False, path_or_buf=file)
+
+                        return (value.loc["ID"], False)
 
         except pd.errors.EmptyDataError: # eccezione nel caso il file sia vuoto
             dataset = pd.DataFrame(pd.DataFrame({"ID": [obj.get("id")], "Take": [obj.get("take")]}))
@@ -58,6 +83,8 @@ def manage(file, obj):
             dataset = pd.DataFrame(pd.DataFrame({"ID": [obj.get("id")], "Take": [obj.get("take")]}))
 
             dataset.to_csv(index=False, path_or_buf=file)
+
+    return (None, True)
 
 def response(action):
 
@@ -71,51 +98,51 @@ def response(action):
     #region FoodList
     firebaseList = {
         "first dishes": [{
-            0: {"id": 0, "take": 2, "calories": 200, "name": "Vegetagle Soup"}
+            0: {"id": 0, "take": 3, "calories": 200, "name": "Vegetagle Soup"}
         }, {
-            1: {"id": 1, "take": 2, "calories": 250, "name": "Vegetable couscous"}
+            1: {"id": 1, "take": 3, "calories": 250, "name": "Vegetable couscous"}
         }, {
-            2: {"id": 2, "take": 2, "calories": 350, "name": "Pasta with artichokes"}
+            2: {"id": 2, "take": 3, "calories": 350, "name": "Pasta with artichokes"}
         }, {
-            3: {"id": 3, "take": 2, "calories": 230, "name": "Mushroom and Potato Soup"}
+            3: {"id": 3, "take": 3, "calories": 230, "name": "Mushroom and Potato Soup"}
         }, {
-            4: {"id": 4, "take": 2, "calories": 210, "name": "Cream of Pumpkin"}
+            4: {"id": 4, "take": 3, "calories": 210, "name": "Cream of Pumpkin"}
         }, {
-            5: {"id": 5, "take": 2, "calories": 360, "name": "Ricotta Pasta"}
+            5: {"id": 5, "take": 3, "calories": 360, "name": "Ricotta Pasta"}
         }, {
-            6: {"id": 6, "take": 2, "calories": 360, "name": "Tagliatelle with Mushrooms"}
+            6: {"id": 6, "take": 3, "calories": 360, "name": "Tagliatelle with Mushrooms"}
         }, {
-            7: {"id": 7, "take": 2, "calories": 375, "name": "Spaghetti with Garlic and Oil"}
+            7: {"id": 7, "take": 3, "calories": 375, "name": "Spaghetti with Garlic and Oil"}
         }, {
-            8: {"id": 8, "take": 2, "calories": 385, "name": "Gnocchi with Tomato Sauce"}
+            8: {"id": 8, "take": 3, "calories": 385, "name": "Gnocchi with Tomato Sauce"}
         }],
 
         "fruit" : [{
-            0: {"id": 0, "take": 2, "calories": 89, "name": "banana"}
+            0: {"id": 0, "take": 11, "calories": 89, "name": "banana"}
         }, {
             1: {"id": 1, "take": 2, "calories": 52, "name": "apple"}
         }, {
-            2: {"id": 2, "take": 2, "calories": 57, "name": "pear"}
+            2: {"id": 2, "take": 5, "calories": 57, "name": "pear"}
         }],
 
         "second dishes" : [{
-            0: {"id": 0, "take": 2, "calories": 290, "name": "Grilled Lamb Chops"}
+            0: {"id": 0, "take": 3, "calories": 290, "name": "Grilled Lamb Chops"}
         }, {
-            1: {"id": 1, "take": 2, "calories": 185, "name": "Hard Boiled Eggs"}
+            1: {"id": 1, "take": 3, "calories": 185, "name": "Hard Boiled Eggs"}
         }, {
-            2: {"id": 3, "take": 2, "calories": 200, "name": "Grilled Pork Chops"}
+            2: {"id": 3, "take": 3, "calories": 200, "name": "Grilled Pork Chops"}
         }, {
-            3: {"id": 4, "take": 2, "calories": 220, "name": "Paprika Chicken Legs"}
+            3: {"id": 4, "take": 3, "calories": 220, "name": "Paprika Chicken Legs"}
         }, {
-            4: {"id": 5, "take": 2, "calories": 250, "name": "Sea Bass in Salt Crust"}
+            4: {"id": 5, "take": 3, "calories": 250, "name": "Sea Bass in Salt Crust"}
         }, {
-            5: {"id": 6, "take": 2, "calories": 270, "name": "Pan-Fried Chicken"}
+            5: {"id": 6, "take": 3, "calories": 270, "name": "Pan-Fried Chicken"}
         }],
 
         "side dishes": [{
-            0: {"id": 0, "take": 2, "calories": 77, "name": "potato"}
+            0: {"id": 0, "take": 10, "calories": 77, "name": "potato"}
         }, {
-            1: {"id": 1, "take": 2, "calories": 18, "name": "tomato"}
+            1: {"id": 1, "take": 11, "calories": 18, "name": "tomato"}
         }]
     }
     #endregion
@@ -149,41 +176,143 @@ def response(action):
 
     if len(typeOfMeal) == 1:
         if list.get('meal') in typeOfMeal:
-            response += elementFirstDishes.get("name") + ' (' + str(elementFirstDishes.get("calories")) + ' kcal), ' + \
-                elementSecondDishes.get("name") + ' (' + str(elementSecondDishes.get("calories")) + ' kcal), ' + \
-                elementSideDishes.get("name") + ' (' + str(elementSideDishes.get("calories")) + ' kcal) and ' + \
-                elementFruit.get("name") + ' (' + str(elementFruit.get("calories")) + ' kcal)'
 
-            manage(str(date.isocalendar(date.today())[1])+'First.txt', elementFirstDishes)
+            # print(str(value) + ' ' + str([value[0]]))
+
+            # response = catResponse(response, str(date.isocalendar(date.today())[1])+'First.txt', listFirstDishes, elementFirstDishes)
+
+            value = manage(str(date.isocalendar(date.today())[1]) + 'First.txt', elementFirstDishes)
+
+            if value == (None, True):
+                response += elementFirstDishes.get("name") + ' (' + str(
+                    elementFirstDishes.get("calories")) + ' kcal), '
+            else:
+                elementFirstDishes = listFirstDishes.__getitem__(value[0]).get(value[0])
+                response += elementFirstDishes.get("name") + ' (' + str(
+                    elementFirstDishes.get("calories")) + ' kcal), '
+
+            value = manage(str(date.isocalendar(date.today())[1]) + 'Second.txt', elementSecondDishes)
+
+            if value == (None, True):
+                response += elementSecondDishes.get("name") + ' (' + str(
+                    elementSecondDishes.get("calories")) + ' kcal), '
+            else:
+                elementSecondDishes = listSecondDishes.__getitem__(value[0]).get(value[0])
+                response += elementSecondDishes.get("name") + ' (' + str(
+                    elementSecondDishes.get("calories")) + ' kcal), '
+
+            value = manage(str(date.isocalendar(date.today())[1]) + 'Side.txt', elementSideDishes)
+
+            if value == (None, True):
+                response += elementSideDishes.get("name") + ' (' + str(
+                    elementSideDishes.get("calories")) + ' kcal) and '
+            else:
+                elementSideDishes = listSideDishes.__getitem__(value[0]).get(value[0])
+                response += elementSideDishes.get("name") + ' (' + str(
+                    elementSideDishes.get("calories")) + ' kcal) and '
+
+            value = manage(str(date.isocalendar(date.today())[1]) + 'Fruit.txt', elementFruit)
+
+            if value == (None, True):
+                response += elementFruit.get("name") + ' (' + str(
+                    elementFruit.get("calories")) + ' kcal)'
+            else:
+                elementFruit = listFruit.__getitem__(value[0]).get(value[0])
+                response += elementFruit.get("name") + ' (' + str(
+                    elementFruit.get("calories")) + ' kcal)'
 
         if list.get('single dish')[0] in typeOfMeal:
-            response += elementFirstDishes.get("name") + ' (' + str(elementFirstDishes.get("calories")) + ' kcal)'
+            value = manage(str(date.isocalendar(date.today())[1]) + 'First.txt', elementFirstDishes)
+
+            if value == (None, True):
+                response += elementFirstDishes.get("name") + ' (' + str(
+                    elementFirstDishes.get("calories")) + ' kcal)'
+            else:
+                elementFirstDishes = listFirstDishes.__getitem__(value[0]).get(value[0])
+                response += elementFirstDishes.get("name") + ' (' + str(
+                    elementFirstDishes.get("calories")) + ' kcal)'
 
         if list.get('single dish')[1] in typeOfMeal:
-            response += elementSecondDishes.get("name") + ' (' + str(elementSecondDishes.get("calories")) + ' kcal)'
+            value = manage(str(date.isocalendar(date.today())[1]) + 'Second.txt', elementSecondDishes)
+
+            if value == (None, True):
+                response += elementSecondDishes.get("name") + ' (' + str(
+                    elementSecondDishes.get("calories")) + ' kcal)'
+            else:
+                elementSecondDishes = listSecondDishes.__getitem__(value[0]).get(value[0])
+                response += elementSecondDishes.get("name") + ' (' + str(
+                    elementSecondDishes.get("calories")) + ' kcal)'
 
         if list.get('single dish')[2] in typeOfMeal:
-            response += elementSideDishes.get("name") + ' (' + str(elementSideDishes.get("calories")) + ' kcal)'
+            value = manage(str(date.isocalendar(date.today())[1]) + 'Side.txt', elementSideDishes)
+
+            if value == (None, True):
+                response += elementSideDishes.get("name") + ' (' + str(
+                    elementSideDishes.get("calories")) + ' kcal)'
+            else:
+                elementSideDishes = listSideDishes.__getitem__(value[0]).get(value[0])
+                response += elementSideDishes.get("name") + ' (' + str(
+                    elementSideDishes.get("calories")) + ' kcal)'
 
         if list.get('single dish')[3] in typeOfMeal:
-            response += elementFruit.get("name") + ' (' + str(elementFruit.get("calories")) + ' kcal)'
+            value = manage(str(date.isocalendar(date.today())[1]) + 'Fruit.txt', elementFruit)
+
+            if value == (None, True):
+                response += elementFruit.get("name") + ' (' + str(
+                    elementFruit.get("calories")) + ' kcal)'
+            else:
+                elementFruit = listFruit.__getitem__(value[0]).get(value[0])
+                response += elementFruit.get("name") + ' (' + str(
+                    elementFruit.get("calories")) + ' kcal)'
 
     if len(typeOfMeal) > 1:
         for i in range(0, len(typeOfMeal)):
             if list.get('single dish')[0] in typeOfMeal[i]:
-                response += elementFirstDishes.get("name") + ' (' + str(elementFirstDishes.get("calories")) + ' kcal)'
+                value = manage(str(date.isocalendar(date.today())[1]) + 'First.txt', elementFirstDishes)
+
+                if value == (None, True):
+                    response += elementFirstDishes.get("name") + ' (' + str(
+                        elementFirstDishes.get("calories")) + ' kcal)'
+                else:
+                    elementFirstDishes = listFirstDishes.__getitem__(value[0]).get(value[0])
+                    response += elementFirstDishes.get("name") + ' (' + str(
+                        elementFirstDishes.get("calories")) + ' kcal)'
 
             if list.get('single dish')[1] in typeOfMeal[i]:
-                response += elementSecondDishes.get("name") + ' (' + str(elementSecondDishes.get("calories")) + ' kcal)'
+                value = manage(str(date.isocalendar(date.today())[1]) + 'Second.txt', elementSecondDishes)
+
+                if value == (None, True):
+                    response += elementSecondDishes.get("name") + ' (' + str(
+                        elementSecondDishes.get("calories")) + ' kcal)'
+                else:
+                    elementSecondDishes = listSecondDishes.__getitem__(value[0]).get(value[0])
+                    response += elementSecondDishes.get("name") + ' (' + str(
+                        elementSecondDishes.get("calories")) + ' kcal)'
 
             if list.get('single dish')[2] in typeOfMeal[i]:
-                response += elementSideDishes.get("name") + ' (' + str(elementSideDishes.get("calories")) + ' kcal)'
+                value = manage(str(date.isocalendar(date.today())[1]) + 'Side.txt', elementSideDishes)
+
+                if value == (None, True):
+                    response += elementSideDishes.get("name") + ' (' + str(
+                        elementSideDishes.get("calories")) + ' kcal)'
+                else:
+                    elementSideDishes = listSideDishes.__getitem__(value[0]).get(value[0])
+                    response += elementSideDishes.get("name") + ' (' + str(
+                        elementSideDishes.get("calories")) + ' kcal)'
 
             if list.get('single dish')[3] in typeOfMeal[i]:
-                response += elementFruit.get("name") + ' (' + str(elementFruit.get("calories")) + ' kcal)'
+                value = manage(str(date.isocalendar(date.today())[1]) + 'Fruit.txt', elementFruit)
+
+                if value == (None, True):
+                    response += elementFruit.get("name") + ' (' + str(
+                        elementFruit.get("calories")) + ' kcal)'
+                else:
+                    elementFruit = listFruit.__getitem__(value[0]).get(value[0])
+                    response += elementFruit.get("name") + ' (' + str(
+                        elementFruit.get("calories")) + ' kcal)'
 
             if i == len(typeOfMeal)-2:
-                response += ' and '
+                    response += ' and '
             elif i < len(typeOfMeal)-1:
                 response += ', '
 
