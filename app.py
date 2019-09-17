@@ -12,6 +12,58 @@ from setUp import SetUp
 # initialize the flask app
 app = Flask(__name__)
 
+#region FoodList
+firebaseList = {
+    "first dishes": [{
+        0: {"id": 0, "take": 3, "calories": 200, "name": "Vegetagle Soup"}
+    }, {
+        1: {"id": 1, "take": 3, "calories": 250, "name": "Vegetable couscous"}
+    }, {
+        2: {"id": 2, "take": 3, "calories": 350, "name": "Pasta with artichokes"}
+    }, {
+        3: {"id": 3, "take": 3, "calories": 230, "name": "Mushroom and Potato Soup"}
+    }, {
+        4: {"id": 4, "take": 3, "calories": 210, "name": "Cream of Pumpkin"}
+    }, {
+        5: {"id": 5, "take": 3, "calories": 360, "name": "Ricotta Pasta"}
+    }, {
+        6: {"id": 6, "take": 3, "calories": 360, "name": "Tagliatelle with Mushrooms"}
+    }, {
+        7: {"id": 7, "take": 3, "calories": 375, "name": "Spaghetti with Garlic and Oil"}
+    }, {
+        8: {"id": 8, "take": 3, "calories": 385, "name": "Gnocchi with Tomato Sauce"}
+    }],
+
+    "fruit" : [{
+        0: {"id": 0, "take": 11, "calories": 89, "name": "banana"}
+    }, {
+        1: {"id": 1, "take": 2, "calories": 52, "name": "apple"}
+    }, {
+        2: {"id": 2, "take": 5, "calories": 57, "name": "pear"}
+    }],
+
+    "second dishes" : [{
+        0: {"id": 0, "take": 3, "calories": 290, "name": "Grilled Lamb Chops"}
+    }, {
+        1: {"id": 1, "take": 3, "calories": 185, "name": "Hard Boiled Eggs"}
+    }, {
+        2: {"id": 3, "take": 3, "calories": 200, "name": "Grilled Pork Chops"}
+    }, {
+        3: {"id": 4, "take": 3, "calories": 220, "name": "Paprika Chicken Legs"}
+    }, {
+        4: {"id": 5, "take": 3, "calories": 250, "name": "Sea Bass in Salt Crust"}
+    }, {
+        5: {"id": 6, "take": 3, "calories": 270, "name": "Pan-Fried Chicken"}
+    }],
+
+    "side dishes": [{
+        0: {"id": 0, "take": 10, "calories": 77, "name": "potato"}
+    }, {
+        1: {"id": 1, "take": 11, "calories": 18, "name": "tomato"}
+    }]
+}
+#endregion
+
 # default route
 @app.route('/')
 def index():
@@ -33,6 +85,9 @@ def results():
     if (action.get('action') == 'input.meal'): # se il valore è uguale a input.meal (default)
         return {'fulfillmentText': response(action)}
 
+    if (action.get('action') == 'input.change'):
+        return {'fulfillmentText': changeFood(action)}
+
 # create a route for webhook
 @app.route('/webhook', methods=['GET', 'POST'])
 def webhook():
@@ -40,36 +95,41 @@ def webhook():
 
 # catResponse(response, str(date.isocalendar(date.today())[1])+'First.txt', listFirstDishes, elementFirstDishes)
 def catResponse(response, file, list, element):
-    value = manage(file, element)
+    value = manage(file, list, element)
 
     if value == (None, True):
-        return response + element.get("name") + ' (' + str(
-            element.get("calories")) + ' kcal)'
+        return response + element.get("name") + ' (' + str(element.get("calories")) + ' kcal)'
+
+    elif value == (None, False):
+        print("error")
+
     else:
         element = list.__getitem__(value[0]).get(value[0])
-        return response + element.get("name") + ' (' + str(
-            element.get("calories")) + ' kcal)'
-
+        return response + element.get("name") + ' (' + str(element.get("calories")) + ' kcal)'
 
 # function for manage dataset
-def manage(file, obj):
+def manage(file, list, obj):
     try: # file esiste
         try: # file esiste e contiene minimo una riga
             dataset = pd.read_csv(file, sep=",", error_bad_lines=False)  # Leggo tutto il file
 
+            for i in range(0, len(dataset.index)):
+                dataset.iloc[i]["Last"] = 0
+
             if obj.get("id") not in dataset["ID"].to_list(): # alimento non ancora mangiato nella settimana x
                 dataset = dataset.append(pd.DataFrame({"ID": [obj.get("id")],
-                                                       "Take": [obj.get("take")]}), ignore_index=True)
+                                                       "Take": [obj.get("take")],
+                                                       "Last": [1]}), ignore_index=True)
 
                 dataset.to_csv(index=False, path_or_buf=file)
             else: # è stato mangiato
                 for i in range(0, len(dataset.index)):
+                    # se posso assumere ancora l'alimento
                     if (obj.get("id") == dataset.iloc[i]["ID"] and int(dataset.iloc[i]["Take"]) > 0):
-                        # se posso assumere ancora l'alimento
-                        print("Decremento la colonna Take per l'elemento "
-                              + str(dataset.iloc[i]["ID"]))
+                        print("Decremento la colonna Take per l'elemento " + str(dataset.iloc[i]["ID"]))
 
                         dataset.iloc[i]["Take"] -= 1
+                        dataset.iloc[i]["Last"] = 1
 
                         dataset.to_csv(index=False, path_or_buf=file)
 
@@ -78,23 +138,50 @@ def manage(file, obj):
                         print("Cercare un nuovo alimento, possibile rimpiazzo: "
                               + str(dataset.loc[dataset["Take"].idxmax()]))
 
-                        value = dataset.loc[dataset["Take"].idxmax()]
+                        if len(list) == len(dataset.index): # proposti almeno una volta tutti i prodotti
+                            value = dataset.loc[dataset["Take"].idxmax()]
 
-                        for j in range(0, len(dataset.index)): # recupero la riga e decremento Take
-                            if value.loc["ID"] == dataset.iloc[j]["ID"]:
-                                dataset.iloc[j]["Take"] -= 1
-                                break
+                            for j in range(0, len(dataset.index)): # recupero la riga e decremento Take
+                                if value.loc["ID"] == dataset.iloc[j]["ID"]:
+                                    if dataset.iloc[j]["Take"] > 0:
+                                        dataset.iloc[j]["Take"] -= 1
+                                        dataset.iloc[j]["Last"] = 1
+                                        break
 
-                        dataset.to_csv(index=False, path_or_buf=file)
+                                    elif dataset.iloc[j]["Take"] == 0:
+                                        return (None, False) # coppia che indica un errore
 
-                        return (value.loc["ID"], False)
+                            dataset.to_csv(index=False, path_or_buf=file)
+
+                            return (value.loc["ID"], False)
+
+                        elif len(list) > len(dataset.index): # non sonoo stati prodotti tutti i prodotti
+                            lenList = len(list) - 1
+
+                            while True: # do-while: restituisco un prodotto diverso dal precedente e non ancora proposto
+                                value = random.randint(0, lenList)
+
+                                if value != obj.get("id") and value not in dataset["ID"].to_list():
+                                    break
+
+                            for i in range(0, len(list)): # prelevo l'elemento dalla lista
+                                if value == list[i].__getitem__(i).get('id'):
+                                    obj = list[i].__getitem__(i)
+
+                            dataset = dataset.append(pd.DataFrame({"ID": [obj.get("id")],
+                                                                   "Take": [obj.get("take")],
+                                                                   "Last": [1]}), ignore_index=True)
+
+                            dataset.to_csv(index=False, path_or_buf=file)
+
+                            return (obj.get("id"), False)
 
         except pd.errors.EmptyDataError: # eccezione nel caso il file sia vuoto
-            dataset = pd.DataFrame(pd.DataFrame({"ID": [obj.get("id")], "Take": [obj.get("take")]}))
+            dataset = pd.DataFrame(pd.DataFrame({"ID": [obj.get("id")], "Take": [obj.get("take")], "Last": [1]}))
 
             dataset.to_csv(index=False, path_or_buf=file)
     except FileNotFoundError: # eccezione nel caso non venga trovato il file
-            dataset = pd.DataFrame(pd.DataFrame({"ID": [obj.get("id")], "Take": [obj.get("take")]}))
+            dataset = pd.DataFrame(pd.DataFrame({"ID": [obj.get("id")], "Take": [obj.get("take")], "Last": [1]}))
 
             dataset.to_csv(index=False, path_or_buf=file)
 
@@ -108,58 +195,6 @@ def response(action):
     response = responseList[random.randint(0, 1)] # imposto la risposta di default
 
     typeOfMeal = action.get('parameters').get('TypeOfMeal')
-
-    #region FoodList
-    firebaseList = {
-        "first dishes": [{
-            0: {"id": 0, "take": 3, "calories": 200, "name": "Vegetagle Soup"}
-        }, {
-            1: {"id": 1, "take": 3, "calories": 250, "name": "Vegetable couscous"}
-        }, {
-            2: {"id": 2, "take": 3, "calories": 350, "name": "Pasta with artichokes"}
-        }, {
-            3: {"id": 3, "take": 3, "calories": 230, "name": "Mushroom and Potato Soup"}
-        }, {
-            4: {"id": 4, "take": 3, "calories": 210, "name": "Cream of Pumpkin"}
-        }, {
-            5: {"id": 5, "take": 3, "calories": 360, "name": "Ricotta Pasta"}
-        }, {
-            6: {"id": 6, "take": 3, "calories": 360, "name": "Tagliatelle with Mushrooms"}
-        }, {
-            7: {"id": 7, "take": 3, "calories": 375, "name": "Spaghetti with Garlic and Oil"}
-        }, {
-            8: {"id": 8, "take": 3, "calories": 385, "name": "Gnocchi with Tomato Sauce"}
-        }],
-
-        "fruit" : [{
-            0: {"id": 0, "take": 11, "calories": 89, "name": "banana"}
-        }, {
-            1: {"id": 1, "take": 2, "calories": 52, "name": "apple"}
-        }, {
-            2: {"id": 2, "take": 5, "calories": 57, "name": "pear"}
-        }],
-
-        "second dishes" : [{
-            0: {"id": 0, "take": 3, "calories": 290, "name": "Grilled Lamb Chops"}
-        }, {
-            1: {"id": 1, "take": 3, "calories": 185, "name": "Hard Boiled Eggs"}
-        }, {
-            2: {"id": 3, "take": 3, "calories": 200, "name": "Grilled Pork Chops"}
-        }, {
-            3: {"id": 4, "take": 3, "calories": 220, "name": "Paprika Chicken Legs"}
-        }, {
-            4: {"id": 5, "take": 3, "calories": 250, "name": "Sea Bass in Salt Crust"}
-        }, {
-            5: {"id": 6, "take": 3, "calories": 270, "name": "Pan-Fried Chicken"}
-        }],
-
-        "side dishes": [{
-            0: {"id": 0, "take": 10, "calories": 77, "name": "potato"}
-        }, {
-            1: {"id": 1, "take": 11, "calories": 18, "name": "tomato"}
-        }]
-    }
-    #endregion
 
     listFirstDishes = firebaseList.get('first dishes')
     listSecondDishes = firebaseList.get('second dishes')
@@ -206,53 +241,6 @@ def response(action):
                                    str(date.isocalendar(date.today())[1]) + 'Fruit.txt',
                                    listFruit,
                                    elementFruit)
-
-            '''
-            # print(str(value) + ' ' + str([value[0]]))
-
-            response = catResponse(response, str(date.isocalendar(date.today())[1])+'First.txt', listFirstDishes, elementFirstDishes)
-
-            value = manage(str(date.isocalendar(date.today())[1]) + 'First.txt', elementFirstDishes)
-
-            if value == (None, True):
-                response += elementFirstDishes.get("name") + ' (' + str(
-                    elementFirstDishes.get("calories")) + ' kcal), '
-            else:
-                elementFirstDishes = listFirstDishes.__getitem__(value[0]).get(value[0])
-                response += elementFirstDishes.get("name") + ' (' + str(
-                    elementFirstDishes.get("calories")) + ' kcal), '
-
-            value = manage(str(date.isocalendar(date.today())[1]) + 'Second.txt', elementSecondDishes)
-
-            if value == (None, True):
-                response += elementSecondDishes.get("name") + ' (' + str(
-                    elementSecondDishes.get("calories")) + ' kcal), '
-            else:
-                elementSecondDishes = listSecondDishes.__getitem__(value[0]).get(value[0])
-                response += elementSecondDishes.get("name") + ' (' + str(
-                    elementSecondDishes.get("calories")) + ' kcal), '
-
-            value = manage(str(date.isocalendar(date.today())[1]) + 'Side.txt', elementSideDishes)
-
-            if value == (None, True):
-                response += elementSideDishes.get("name") + ' (' + str(
-                    elementSideDishes.get("calories")) + ' kcal) and '
-            else:
-                elementSideDishes = listSideDishes.__getitem__(value[0]).get(value[0])
-                response += elementSideDishes.get("name") + ' (' + str(
-                    elementSideDishes.get("calories")) + ' kcal) and '
-
-            value = manage(str(date.isocalendar(date.today())[1]) + 'Fruit.txt', elementFruit)
-
-            if value == (None, True):
-                response += elementFruit.get("name") + ' (' + str(
-                    elementFruit.get("calories")) + ' kcal)'
-            else:
-                elementFruit = listFruit.__getitem__(value[0]).get(value[0])
-                response += elementFruit.get("name") + ' (' + str(
-                    elementFruit.get("calories")) + ' kcal)'
-                    
-            '''
 
         if list.get('single dish')[0] in typeOfMeal:
             response = catResponse(response,
@@ -306,10 +294,18 @@ def response(action):
 
             if i == len(typeOfMeal)-2:
                     response += ' and '
+
             elif i < len(typeOfMeal)-1:
                 response += ', '
 
     return response
+
+def cleanColumn():
+    print()
+
+def changeFood(action):
+
+    return "Pippo"
 
 # run the app
 if __name__ == '__main__':
