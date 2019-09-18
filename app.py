@@ -64,6 +64,13 @@ firebaseList = {
 }
 #endregion
 
+list = {'meal': 'meal',
+            'single dish': ['first',
+                            'second',
+                            'side dish',
+                            'fruit']
+            } # lista di supporto per suddividere le tipologie di pasti
+
 # default route
 @app.route('/')
 def index():
@@ -216,13 +223,6 @@ def response(action):
     elementSideDishes = listSideDishes.__getitem__(sideDishes).get(sideDishes)
     elementFruit = listFruit.__getitem__(fruit).get(fruit)
 
-    list = {'meal': 'meal',
-            'single dish': ['first',
-                            'second',
-                            'side dish',
-                            'fruit']
-            } # lista di supporto per suddividere le tipologie di pasti
-
     if len(typeOfMeal) == 1:
         if list.get('meal') in typeOfMeal:
             response = catResponse(response,
@@ -300,12 +300,26 @@ def response(action):
 
     return response
 
-def cleanColumn():
-    print()
-
 def changeFood(action):
+    print(action)
 
-    return "Pippo"
+    typeOfMeal = action.get('parameters').get('TypeOfMeal')
+
+    if len(typeOfMeal) == 1:
+        if list.get('meal') in typeOfMeal:
+            return "meal"
+
+        if list.get('single dish')[0] in typeOfMeal:
+            return "single dish"
+
+        if list.get('single dish')[1] in typeOfMeal:
+            return "second dish"
+
+        if list.get('single dish')[2] in typeOfMeal:
+            return "side dish"
+
+        if list.get('single dish')[3] in typeOfMeal:
+            return "fruit"
 
 # run the app
 if __name__ == '__main__':
