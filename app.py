@@ -135,6 +135,7 @@ def catResponse(new, response, file, list, element):
         elif value == (None, False):
             print("error")
 
+            return response
         else:
             element = list.__getitem__(value[0]).get(value[0]) # prendo il primo valore della coppia -> value[0]
             return response + element.get("name") + ' (' + str(element.get("calories")) + ' kcal)'
@@ -142,20 +143,23 @@ def catResponse(new, response, file, list, element):
     else:
         value = checkChange(file, list)
 
-        print("Value: " + str(value[0]))
+        if value == (None, False):
+            return response
+        else:
+            print("Value: " + str(value[0]))
 
-        element = list.__getitem__(value[0]).get(value[0]) # prendo il primo valore della coppia -> value[0]
+            element = list.__getitem__(value[0]).get(value[0]) # prendo il primo valore della coppia -> value[0]
 
-        print("Element:" + str(element))
+            print("Element:" + str(element))
 
-        return response + element.get("name") + ' (' + str(element.get("calories")) + ' kcal)'
+            return response + element.get("name") + ' (' + str(element.get("calories")) + ' kcal)'
 
 def checkChange(file, list):
     dataset = pd.read_csv(file, sep=",", error_bad_lines=False)  # Leggo tutto il file
 
     old = dataset.loc[dataset["Last"].idxmax()]
 
-    obj = list.__getitem__(0).get(0)  # da modificare
+    obj = 0  # da modificare
 
     print(str(list))
 
@@ -189,28 +193,38 @@ def checkChange(file, list):
             return (obj.get("id"), False)
 
         elif len(list) == len(dataset):
-            lenList = len(list) - 1
-
-            while True:  # do-while: restituisco un prodotto diverso dal precedente e non ancora proposto
-                value = random.randint(0, lenList)
-
-                if value != old.loc["ID"]:
-                    break
-
-            dataset.loc[dataset["Last"].idxmax()]["Take"] += 1
-            dataset.loc[dataset["Last"].idxmax()]["Last"] = 0
+            index = 0
 
             for i in range(0, len(dataset.index)):
-                if value == dataset.iloc[i]["ID"]:
+                if old.loc["ID"] == dataset.iloc[i]["ID"]:
+                    index = i
+
+            flag = False
+
+            for i in range(0, len(dataset.index)):
+                if dataset.iloc[i]["ID"] != old.loc["ID"] and dataset.iloc[i]["Take"] > 0:
                     dataset.iloc[i]["Take"] -= 1
                     dataset.iloc[i]["Last"] = 1
 
                     obj = dataset.iloc[i]["ID"]
 
-            dataset.to_csv(index=False, path_or_buf=file)
+                    flag = True
 
+                    break
 
-            return (int(obj), False)
+            print("Popo")
+
+            if flag:
+                dataset.iloc[index]["Take"] += 1
+                dataset.iloc[index]["Last"] = 0
+
+                dataset.to_csv(index=False, path_or_buf=file)
+
+                return (obj, True)
+            else:
+                dataset.to_csv(index=False, path_or_buf=file)
+
+                return (index, False)
 
     return (None, False)
 
@@ -429,11 +443,6 @@ def changeFood(action):
     lenListSideDishes = len(listSideDishes) - 1
     lenListFruit = len(listFruit) - 1
 
-    firstDishes = random.randint(0, lenListFirstDishes)
-    secondDishes = random.randint(0, lenListSecondDishes)
-    sideDishes = random.randint(0, lenListSideDishes)
-    fruit = random.randint(0, lenListFruit)
-
     if len(typeOfMeal) == 1:
         if list.get('meal') in typeOfMeal:
             response = catResponse(False,
@@ -456,19 +465,71 @@ def changeFood(action):
                                    str(date.isocalendar(date.today())[1]) + 'Fruit.txt',
                                    listFruit,
                                    None)
-        '''
+
         if list.get('single dish')[0] in typeOfMeal:
-            return "single dish"
+            response = catResponse(True,
+                                   response,
+                                   str(date.isocalendar(date.today())[1]) + 'First.txt',
+                                   listFirstDishes,
+                                   None)
 
         if list.get('single dish')[1] in typeOfMeal:
-            return "second dish"
+            response = catResponse(True,
+                                   response,
+                                   str(date.isocalendar(date.today())[1]) + 'Second.txt',
+                                   listSecondDishes,
+                                   None)
 
         if list.get('single dish')[2] in typeOfMeal:
-            return "side dish"
+            response = catResponse(True,
+                                   response,
+                                   str(date.isocalendar(date.today())[1]) + 'Side.txt',
+                                   listSideDishes,
+                                   None)
 
         if list.get('single dish')[3] in typeOfMeal:
-            return "fruit"
-        '''
+            response = catResponse(True,
+                                   response,
+                                   str(date.isocalendar(date.today())[1]) + 'Fruit.txt',
+                                   listFruit,
+                                   None)
+
+    if len(typeOfMeal) > 1:
+        for i in range(0, len(typeOfMeal)):
+            if list.get('single dish')[0] in typeOfMeal[i]:
+                response = catResponse(False,
+                                       response,
+                                       str(date.isocalendar(date.today())[1]) + 'First.txt',
+                                       listFirstDishes,
+                                       None)
+
+            if list.get('single dish')[1] in typeOfMeal[i]:
+                response = catResponse(False,
+                                       response,
+                                       str(date.isocalendar(date.today())[1]) + 'Second.txt',
+                                       listSecondDishes,
+                                       None)
+
+            if list.get('single dish')[2] in typeOfMeal[i]:
+                response = catResponse(False,
+                                       response,
+                                       str(date.isocalendar(date.today())[1]) + 'Side.txt',
+                                       listSideDishes,
+                                       None)
+
+            if list.get('single dish')[3] in typeOfMeal[i]:
+                response = catResponse(False,
+                                       response,
+                                       str(date.isocalendar(date.today())[1]) + 'Fruit.txt',
+                                       listFruit,
+                                       None)
+
+            if i == len(typeOfMeal) - 2:
+                response += ' and '
+
+            elif i < len(typeOfMeal) - 1:
+                response += ', '
+
     return response
 
 # run the app
