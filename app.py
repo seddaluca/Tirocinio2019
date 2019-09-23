@@ -130,21 +130,21 @@ def catResponse(new, response, file, list, element):
         value = manage(file, list, element)
 
         if value == (None, True):
-            return response + element.get("name") + ' (' + str(element.get("calories")) + ' kcal)'
+            return (element.get("name") + ' (' + str(element.get("calories")) + ' kcal)', True)
 
         elif value == (None, False):
             print("error")
 
-            return response
+            return (None, False)
         else:
             element = list.__getitem__(value[0]).get(value[0]) # prendo il primo valore della coppia -> value[0]
-            return response + element.get("name") + ' (' + str(element.get("calories")) + ' kcal)'
+            return (element.get("name") + ' (' + str(element.get("calories")) + ' kcal)', True)
 
     else:
         value = checkChange(file, list)
 
         if value == (None, False):
-            return response
+            return (None, False)
         else:
             print("Value: " + str(value[0]))
 
@@ -152,7 +152,7 @@ def catResponse(new, response, file, list, element):
 
             print("Element:" + str(element))
 
-            return response + element.get("name") + ' (' + str(element.get("calories")) + ' kcal)'
+            return (element.get("name") + ' (' + str(element.get("calories")) + ' kcal)', True)
 
 def checkChange(file, list):
     dataset = pd.read_csv(file, sep=",", error_bad_lines=False)  # Leggo tutto il file
@@ -311,6 +311,8 @@ def manage(file, list, obj):
     return (None, True)
 
 def response(action):
+    responseListFood  = []
+
     typeOfMeal = action.get('parameters').get('TypeOfMeal')
 
     response = responseList[random.randint(0, 1)]  # imposto la risposta di default
@@ -339,95 +341,151 @@ def response(action):
 
     if len(typeOfMeal) == 1:
         if list.get('meal') in typeOfMeal:
-            response = catResponse(True,
-                                   response,
-                                   str(date.isocalendar(date.today())[1]) + 'First.txt',
-                                   listFirstDishes,
-                                   elementFirstDishes) + ', '
-            response = catResponse(True,
-                                   response,
-                                   str(date.isocalendar(date.today())[1]) + 'Second.txt',
-                                   listSecondDishes,
-                                   elementSecondDishes) + ', '
-            response = catResponse(True,
-                                   response,
-                                   str(date.isocalendar(date.today())[1]) + 'Side.txt',
-                                   listSideDishes,
-                                   elementSideDishes) + ' and '
-            response = catResponse(True,
-                                   response,
-                                   str(date.isocalendar(date.today())[1]) + 'Fruit.txt',
-                                   listFruit,
-                                   elementFruit)
+            value = catResponse(True,
+                                response,
+                                str(date.isocalendar(date.today())[1]) + 'First.txt',
+                                listFirstDishes,
+                                elementFirstDishes)
 
-        if list.get('single dish')[0] in typeOfMeal:
-            response = catResponse(True,
-                                   response,
-                                   str(date.isocalendar(date.today())[1]) + 'First.txt',
-                                   listFirstDishes,
-                                   elementFirstDishes)
+            print(str(value))
 
-        if list.get('single dish')[1] in typeOfMeal:
-            response = catResponse(True,
-                                   response,
-                                   str(date.isocalendar(date.today())[1]) + 'Second.txt',
-                                   listSecondDishes,
-                                   elementSecondDishes)
+            if value[1] == True:
+                responseListFood.append(value[0])
 
-        if list.get('single dish')[2] in typeOfMeal:
-            response = catResponse(True,
+            value = catResponse(True,
+                                response,
+                                str(date.isocalendar(date.today())[1]) + 'Second.txt',
+                                listSecondDishes,
+                                elementSecondDishes)
+
+            if value[1] == True:
+                responseListFood.append(value[0])
+
+            value = catResponse(True,
                                    response,
                                    str(date.isocalendar(date.today())[1]) + 'Side.txt',
                                    listSideDishes,
                                    elementSideDishes)
 
-        if list.get('single dish')[3] in typeOfMeal:
-            response = catResponse(True,
+            if value[1] == True:
+                responseListFood.append(value[0])
+
+            value = catResponse(True,
                                    response,
                                    str(date.isocalendar(date.today())[1]) + 'Fruit.txt',
                                    listFruit,
                                    elementFruit)
 
+            if value[1] == True:
+                responseListFood.append(value[0])
+
+        if list.get('single dish')[0] in typeOfMeal:
+            value = catResponse(True,
+                                   response,
+                                   str(date.isocalendar(date.today())[1]) + 'First.txt',
+                                   listFirstDishes,
+                                   elementFirstDishes)
+
+            if value[1] == True:
+                return response + value[0]
+            else:
+                return "My work is done, you've already eatten."
+
+        if list.get('single dish')[1] in typeOfMeal:
+            value = catResponse(True,
+                                   response,
+                                   str(date.isocalendar(date.today())[1]) + 'Second.txt',
+                                   listSecondDishes,
+                                   elementSecondDishes)
+
+            if value[1] == True:
+                return response + value[0]
+            else:
+                return "My work is done, you've already eatten."
+
+        if list.get('single dish')[2] in typeOfMeal:
+            value = catResponse(True,
+                                   response,
+                                   str(date.isocalendar(date.today())[1]) + 'Side.txt',
+                                   listSideDishes,
+                                   elementSideDishes)
+
+            if value[1] == True:
+                return response + value[0]
+            else:
+                return "My work is done, you've already eatten."
+
+        if list.get('single dish')[3] in typeOfMeal:
+            value = catResponse(True,
+                                   response,
+                                   str(date.isocalendar(date.today())[1]) + 'Fruit.txt',
+                                   listFruit,
+                                   elementFruit)
+
+            if value[1] == True:
+                return response + value[0]
+            else:
+                return "My work is done, you've already eatten."
+
     if len(typeOfMeal) > 1:
         for i in range(0, len(typeOfMeal)):
             if list.get('single dish')[0] in typeOfMeal[i]:
-                response = catResponse(True,
+                value = catResponse(True,
                                        response,
                                        str(date.isocalendar(date.today())[1]) + 'First.txt',
                                        listFirstDishes,
                                        elementFirstDishes)
 
+                if value[1] == True:
+                    responseListFood.append(value[0])
+
             if list.get('single dish')[1] in typeOfMeal[i]:
-                response = catResponse(True,
+                value = catResponse(True,
                                        response,
                                        str(date.isocalendar(date.today())[1]) + 'Second.txt',
                                        listSecondDishes,
                                        elementSecondDishes)
 
+                if value[1] == True:
+                    responseListFood.append(value[0])
+
             if list.get('single dish')[2] in typeOfMeal[i]:
-                response = catResponse(True,
+                value = catResponse(True,
                                        response,
                                        str(date.isocalendar(date.today())[1]) + 'Side.txt',
                                        listSideDishes,
                                        elementSideDishes)
 
+                if value[1] == True:
+                    responseListFood.append(value[0])
+
             if list.get('single dish')[3] in typeOfMeal[i]:
-                response = catResponse(True,
+                value = catResponse(True,
                                        response,
                                        str(date.isocalendar(date.today())[1]) + 'Fruit.txt',
                                        listFruit,
                                        elementFruit)
 
-            if i == len(typeOfMeal)-2:
-                    response += ' and '
+                if value[1] == True:
+                    responseListFood.append(value[0])
 
-            elif i < len(typeOfMeal)-1:
-                response += ', '
+    if len(responseListFood) > 0:
+        for i in range (0, len(responseListFood)):
+            if i == 0:
+                response += responseListFood[i]
+            elif i == len(responseListFood) - 1:
+                response += ' and ' + responseListFood[i]
+            else:
+                response += ', ' + responseListFood[i]
 
-    return response
+        return response
+
+    return "My work is done, you've already eatten."
 
 def changeFood(action):
     print(action)
+
+    responseListFood = []
 
     typeOfMeal = action.get('parameters').get('TypeOfMeal')
 
@@ -438,99 +496,146 @@ def changeFood(action):
     listSideDishes = firebaseList.get('side dishes')
     listFruit = firebaseList.get('fruit')
 
-    lenListFirstDishes = len(listFirstDishes) - 1
-    lenListSecondDishes = len(listSecondDishes) - 1
-    lenListSideDishes = len(listSideDishes) - 1
-    lenListFruit = len(listFruit) - 1
-
     if len(typeOfMeal) == 1:
         if list.get('meal') in typeOfMeal:
-            response = catResponse(False,
+            value = catResponse(False,
                                    response,
                                    str(date.isocalendar(date.today())[1]) + 'First.txt',
                                    listFirstDishes,
-                                   None) + ', '
-            response = catResponse(False,
+                                   None)
+
+            if value[1] == True:
+                responseListFood.append(value[0])
+
+            value = catResponse(False,
                                    response,
                                    str(date.isocalendar(date.today())[1]) + 'Second.txt',
                                    listSecondDishes,
-                                   None) + ', '
-            response = catResponse(False,
+                                   None)
+
+            if value[1] == True:
+                responseListFood.append(value[0])
+
+            value = catResponse(False,
                                    response,
                                    str(date.isocalendar(date.today())[1]) + 'Side.txt',
                                    listSideDishes,
-                                   None) + ' and '
-            response = catResponse(False,
+                                   None)
+
+            if value[1] == True:
+                responseListFood.append(value[0])
+
+            value = catResponse(False,
                                    response,
                                    str(date.isocalendar(date.today())[1]) + 'Fruit.txt',
                                    listFruit,
                                    None)
+
+            if value[1] == True:
+                responseListFood.append(value[0])
 
         if list.get('single dish')[0] in typeOfMeal:
-            response = catResponse(True,
+            value = catResponse(False,
                                    response,
                                    str(date.isocalendar(date.today())[1]) + 'First.txt',
                                    listFirstDishes,
                                    None)
 
+            if value[1] == True:
+                return response + value[0]
+            else:
+                return "My work is done, you've already eatten."
+
         if list.get('single dish')[1] in typeOfMeal:
-            response = catResponse(True,
+            value = catResponse(False,
                                    response,
                                    str(date.isocalendar(date.today())[1]) + 'Second.txt',
                                    listSecondDishes,
                                    None)
 
+            if value[1] == True:
+                return response + value[0]
+            else:
+                return "My work is done, you've already eatten."
+
         if list.get('single dish')[2] in typeOfMeal:
-            response = catResponse(True,
+            value = catResponse(False,
                                    response,
                                    str(date.isocalendar(date.today())[1]) + 'Side.txt',
                                    listSideDishes,
                                    None)
 
+            if value[1] == True:
+                return response + value[0]
+            else:
+                return "My work is done, you've already eatten."
+
         if list.get('single dish')[3] in typeOfMeal:
-            response = catResponse(True,
+            value = catResponse(False,
                                    response,
                                    str(date.isocalendar(date.today())[1]) + 'Fruit.txt',
                                    listFruit,
                                    None)
+
+            if value[1] == True:
+                return response + value[0]
+            else:
+                return "My work is done, you've already eatten."
 
     if len(typeOfMeal) > 1:
         for i in range(0, len(typeOfMeal)):
             if list.get('single dish')[0] in typeOfMeal[i]:
-                response = catResponse(False,
+                value = catResponse(False,
                                        response,
                                        str(date.isocalendar(date.today())[1]) + 'First.txt',
                                        listFirstDishes,
                                        None)
 
+                if value[1] == True:
+                    responseListFood.append(value[0])
+
             if list.get('single dish')[1] in typeOfMeal[i]:
-                response = catResponse(False,
+                value = catResponse(False,
                                        response,
                                        str(date.isocalendar(date.today())[1]) + 'Second.txt',
                                        listSecondDishes,
                                        None)
 
+                if value[1] == True:
+                    responseListFood.append(value[0])
+
             if list.get('single dish')[2] in typeOfMeal[i]:
-                response = catResponse(False,
+                value = catResponse(False,
                                        response,
                                        str(date.isocalendar(date.today())[1]) + 'Side.txt',
                                        listSideDishes,
                                        None)
 
+                if value[1] == True:
+                    responseListFood.append(value[0])
+
             if list.get('single dish')[3] in typeOfMeal[i]:
-                response = catResponse(False,
+                value = catResponse(False,
                                        response,
                                        str(date.isocalendar(date.today())[1]) + 'Fruit.txt',
                                        listFruit,
                                        None)
 
-            if i == len(typeOfMeal) - 2:
-                response += ' and '
+                if value[1] == True:
+                    responseListFood.append(value[0])
 
-            elif i < len(typeOfMeal) - 1:
-                response += ', '
+    if len(responseListFood) > 0:
+        for i in range(0, len(responseListFood)):
+            if i == 0:
+                response += responseListFood[i]
+            elif i == len(responseListFood) - 1:
+                response += ' and ' + responseListFood[i]
+            else:
+                response += ', ' + responseListFood[i]
 
-    return response
+        return response
+
+    return "My work is done, you've already eatten."
 
 # run the app
 if __name__ == '__main__':
