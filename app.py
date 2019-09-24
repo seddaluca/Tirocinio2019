@@ -155,76 +155,82 @@ def catResponse(new, response, file, list, element):
             return (element.get("name") + ' (' + str(element.get("calories")) + ' kcal)', True)
 
 def checkChange(file, list):
-    dataset = pd.read_csv(file, sep=",", error_bad_lines=False)  # Leggo tutto il file
+    try:
+        try:
+            dataset = pd.read_csv(file, sep=",", error_bad_lines=False)  # Leggo tutto il file
 
-    old = dataset.loc[dataset["Last"].idxmax()]
+            old = dataset.loc[dataset["Last"].idxmax()]
 
-    obj = 0  # da modificare
+            obj = 0  # da modificare
 
-    print(str(list))
+            print(str(list))
 
-    print(str(old))
+            print(str(old))
 
-    if old.loc["Last"] == 1:
-        if len(list) > len(dataset.index):
-            lenList = len(list) - 1
+            if old.loc["Last"] == 1:
+                if len(list) > len(dataset.index):
+                    lenList = len(list) - 1
 
-            while True:  # do-while: restituisco un prodotto diverso dal precedente e non ancora proposto
-                value = random.randint(0, lenList)
+                    while True:  # do-while: restituisco un prodotto diverso dal precedente e non ancora proposto
+                        value = random.randint(0, lenList)
 
-                if value not in dataset["ID"].to_list():
-                    break
+                        if value not in dataset["ID"].to_list():
+                            break
 
-            for i in range(0, len(list)):  # prelevo l'elemento dalla lista
-                if value == list[i].__getitem__(i).get('id'):
-                    obj = list[i].__getitem__(i)
+                    for i in range(0, len(list)):  # prelevo l'elemento dalla lista
+                        if value == list[i].__getitem__(i).get('id'):
+                            obj = list[i].__getitem__(i)
 
-            dataset.loc[dataset["Last"].idxmax()]["Take"] += 1
-            dataset.loc[dataset["Last"].idxmax()]["Last"] = 0
+                    dataset.loc[dataset["Last"].idxmax()]["Take"] += 1
+                    dataset.loc[dataset["Last"].idxmax()]["Last"] = 0
 
-            dataset = dataset.append(pd.DataFrame({"ID": [obj.get("id")],
-                                                   "Take": [(obj.get("take")-1)],
-                                                   "Last": [1]}), ignore_index=True)
+                    dataset = dataset.append(pd.DataFrame({"ID": [obj.get("id")],
+                                                           "Take": [(obj.get("take") - 1)],
+                                                           "Last": [1]}), ignore_index=True)
 
-            dataset.to_csv(index=False, path_or_buf=file)
+                    dataset.to_csv(index=False, path_or_buf=file)
 
-            print("Sic: " + str(obj.get("id")))
+                    print("Sic: " + str(obj.get("id")))
 
-            return (obj.get("id"), False)
+                    return (obj.get("id"), False)
 
-        elif len(list) == len(dataset):
-            index = 0
+                elif len(list) == len(dataset):
+                    index = 0
 
-            for i in range(0, len(dataset.index)):
-                if old.loc["ID"] == dataset.iloc[i]["ID"]:
-                    index = i
+                    for i in range(0, len(dataset.index)):
+                        if old.loc["ID"] == dataset.iloc[i]["ID"]:
+                            index = i
 
-            flag = False
+                    flag = False
 
-            for i in range(0, len(dataset.index)):
-                if dataset.iloc[i]["ID"] != old.loc["ID"] and dataset.iloc[i]["Take"] > 0:
-                    dataset.iloc[i]["Take"] -= 1
-                    dataset.iloc[i]["Last"] = 1
+                    for i in range(0, len(dataset.index)):
+                        if dataset.iloc[i]["ID"] != old.loc["ID"] and dataset.iloc[i]["Take"] > 0:
+                            dataset.iloc[i]["Take"] -= 1
+                            dataset.iloc[i]["Last"] = 1
 
-                    obj = dataset.iloc[i]["ID"]
+                            obj = dataset.iloc[i]["ID"]
 
-                    flag = True
+                            flag = True
 
-                    break
+                            break
 
-            print("Popo")
+                    print("Popo")
 
-            if flag:
-                dataset.iloc[index]["Take"] += 1
-                dataset.iloc[index]["Last"] = 0
+                    if flag:
+                        dataset.iloc[index]["Take"] += 1
+                        dataset.iloc[index]["Last"] = 0
 
-                dataset.to_csv(index=False, path_or_buf=file)
+                        dataset.to_csv(index=False, path_or_buf=file)
 
-                return (obj, True)
-            else:
-                dataset.to_csv(index=False, path_or_buf=file)
+                        return (obj, True)
+                    else:
+                        dataset.to_csv(index=False, path_or_buf=file)
 
-                return (index, False)
+                        return (index, False)
+        except pd.errors.EmptyDataError: # eccezione nel caso il file sia vuoto
+            return (None, False)
+    except FileNotFoundError: # eccezione nel caso non venga trovato il file
+        return (None, False)
 
     return (None, False)
 

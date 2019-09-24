@@ -3,9 +3,10 @@
   <component name="ChangeListManager">
     <list default="true" id="d667584a-6d6f-45f4-a7e7-04c14e759053" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/38Fruit.txt" beforeDir="false" afterPath="$PROJECT_DIR$/38Fruit.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/38Second.txt" beforeDir="false" afterPath="$PROJECT_DIR$/38Second.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/38Side.txt" beforeDir="false" afterPath="$PROJECT_DIR$/38Side.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/39First.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/39Fruit.txt" beforeDir="false" afterPath="$PROJECT_DIR$/39Fruit.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/39Second.txt" beforeDir="false" afterPath="$PROJECT_DIR$/39Second.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/39Side.txt" beforeDir="false" afterPath="$PROJECT_DIR$/39Side.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/app.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -22,8 +23,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/app.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-586">
-              <caret line="573" column="37" selection-start-line="573" selection-start-column="37" selection-end-line="573" selection-end-column="37" />
+            <state relative-caret-position="1434">
+              <caret line="636" column="20" lean-forward="true" selection-start-line="636" selection-start-column="20" selection-end-line="636" selection-end-column="20" />
               <folding>
                 <element signature="e#0#27#0" expanded="true" />
               </folding>
@@ -34,22 +35,26 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/39First.txt">
           <provider selected="true" editor-type-id="text-editor">
-            <state>
-              <caret column="12" lean-forward="true" selection-start-column="12" selection-end-column="12" />
+            <state relative-caret-position="45">
+              <caret line="3" lean-forward="true" selection-start-line="3" selection-end-line="3" />
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/39Second.txt">
-          <provider selected="true" editor-type-id="text-editor" />
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="119">
+              <caret line="7" selection-start-line="7" selection-end-line="7" />
+            </state>
+          </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/39Side.txt">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="45">
-              <caret line="3" lean-forward="true" selection-start-line="3" selection-end-line="3" />
+              <caret line="3" selection-start-line="3" selection-end-line="3" />
             </state>
           </provider>
         </entry>
@@ -58,7 +63,7 @@
         <entry file="file://$PROJECT_DIR$/39Fruit.txt">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="45">
-              <caret line="3" lean-forward="true" selection-start-line="3" selection-end-line="3" />
+              <caret line="3" column="5" lean-forward="true" selection-start-line="3" selection-start-column="5" selection-end-line="3" selection-end-column="5" />
             </state>
           </provider>
         </entry>
@@ -97,11 +102,11 @@
         <option value="$PROJECT_DIR$/38Second.txt" />
         <option value="$PROJECT_DIR$/38Side.txt" />
         <option value="$PROJECT_DIR$/38Fruit.txt" />
-        <option value="$PROJECT_DIR$/39First.txt" />
         <option value="$PROJECT_DIR$/39Second.txt" />
         <option value="$PROJECT_DIR$/39Fruit.txt" />
         <option value="$PROJECT_DIR$/39Side.txt" />
         <option value="$PROJECT_DIR$/app.py" />
+        <option value="$PROJECT_DIR$/39First.txt" />
       </list>
     </option>
   </component>
@@ -175,12 +180,12 @@
       <option name="presentableId" value="Default" />
       <updated>1568140743961</updated>
       <workItem from="1568140745512" duration="62889000" />
-      <workItem from="1568995154979" duration="10749000" />
+      <workItem from="1568995154979" duration="12563000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="73638000" />
+    <option name="totallyTimeSpent" value="75452000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="23" width="1680" height="981" extended-state="6" />
@@ -320,31 +325,35 @@
     <entry file="file://$PROJECT_DIR$/39Fruit.txt">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="45">
-          <caret line="3" lean-forward="true" selection-start-line="3" selection-end-line="3" />
+          <caret line="3" column="5" lean-forward="true" selection-start-line="3" selection-start-column="5" selection-end-line="3" selection-end-column="5" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/39Side.txt">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="45">
-          <caret line="3" lean-forward="true" selection-start-line="3" selection-end-line="3" />
+          <caret line="3" selection-start-line="3" selection-end-line="3" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/39Second.txt">
-      <provider selected="true" editor-type-id="text-editor" />
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="119">
+          <caret line="7" selection-start-line="7" selection-end-line="7" />
+        </state>
+      </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/39First.txt">
       <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <caret column="12" lean-forward="true" selection-start-column="12" selection-end-column="12" />
+        <state relative-caret-position="45">
+          <caret line="3" lean-forward="true" selection-start-line="3" selection-end-line="3" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-586">
-          <caret line="573" column="37" selection-start-line="573" selection-start-column="37" selection-end-line="573" selection-end-column="37" />
+        <state relative-caret-position="1434">
+          <caret line="636" column="20" lean-forward="true" selection-start-line="636" selection-start-column="20" selection-end-line="636" selection-end-column="20" />
           <folding>
             <element signature="e#0#27#0" expanded="true" />
           </folding>
