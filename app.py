@@ -12,6 +12,42 @@ from setUp import SetUp
 # initialize the flask app
 app = Flask(__name__)
 
+import csv
+
+def reading(file):
+    list = []
+
+    try:
+        with open(file, newline='') as f:
+            reader = csv.reader(f)
+            i = -1
+            for row in reader:
+                if i >= 0:
+                    data = {
+                        "ID": row[0],
+                        "Take": row[1],
+                        "Last": row[2]
+                    }
+
+                    list.append(data)
+                i += 1
+
+        return list
+
+    except FileNotFoundError:
+        print()
+
+    return []
+
+def writing(file):
+
+    with open(file, 'w', newline='') as f:
+        writer = csv.writer(f)
+        list = reading(file)
+        writer.writerow(["ID", "Take", "Last"])
+        for i in range(0, len(list)):
+            writer.writerow([list[i].get('ID'), list[i].get('Take'), list[i].get('Last')])
+
 #region FoodList
 firebaseList = {
     "first dishes": [{
@@ -103,11 +139,18 @@ def results():
 def webhook():
     return make_response(jsonify(results())) # return response
 
+def cleanList(list):
+    if len(list) > 0:
+        for i in range(0, len(list)):
+            list[i].update({'Last': 0})
+
+    return list
+
 def cleanLast():
-    side = ['First.txt',
-            'Second.txt',
-            'Side.txt',
-            'Fruit.txt']
+    side = ['First.csv',
+            'Second.csv',
+            'Side.csv',
+            'Fruit.csv']
 
     for j in range(0,4):
         try: # file esiste
@@ -124,7 +167,7 @@ def cleanLast():
         except FileNotFoundError: # eccezione nel caso non venga trovato il file
             print()
 
-# catResponse(response, str(date.isocalendar(date.today())[1])+'First.txt', listFirstDishes, elementFirstDishes)
+# catResponse(response, str(date.isocalendar(date.today())[1])+'First.csv', listFirstDishes, elementFirstDishes)
 def catResponse(new, response, file, list, element):
     if new:
         value = manage(file, list, element)
@@ -234,16 +277,50 @@ def checkChange(file, list):
 
     return (None, False)
 
+'''
+    Funzione che si occuperà di selezionare i pasti:
+        - listCSV, lista di supporto che contiene i cibi contenuti nel file 
+        - list, lista dei cibi
+        - obj
+'''
+def manageSide(listCSV, listFood, obj):
+    if len(listCSV) == 0:
+        print("Inserisco un nuovo cibo")
+
+        data = {"ID": obj.get("id"), "Take": obj.get("take")-1, "Last": 1}
+
+        listCSV.append(data)
+
+    elif len(listCSV) > 0:
+        for i in range(0, len(listCSV)):
+            if obj.get("id") == listCSV[i].get("ID") and int(listCSV[i].get("Take")) > 0:
+                print("Decremento la colonna Take per l'elemento " + str(listCSV[i].get("ID")))
+
+                listCSV[i].update({"Take": listCSV[i].get("Take")-1,
+                                   "Last": 1})
+
+            elif obj.get("id") == int(listCSV[i].get("ID")) and int(listCSV[i].get("Take")) == 0:
+                print("Cercare un nuovo alimento, possibile rimpiazzo: " + str(listCSV[i].get("ID")))
+
+                if len(listFood) == len(listCSV):
+                    data = max(list(filter(lambda x: x['ID'] != '2', listCSV)), key=lambda item:item['Take'])
+
+                    # da proseguire domani
+
+
+                    return (listCSV, None, True) # --> cambiare il secondo parametro
+                elif len(listFood) > len(listCSV):
+
+                    return (listCSV, None, True) # --> cambiare il secondo parametro
+
+
+    return (listCSV, None, True)
+
 # function for manage dataset
 def manage(file, list, obj):
     try: # file esiste
         try: # file esiste e contiene minimo una riga
             dataset = pd.read_csv(file, sep=",", error_bad_lines=False)  # Leggo tutto il file
-
-            '''
-            for i in range(0, len(dataset.index)):
-                dataset.iloc[i]["Last"] = 0
-            '''
 
             if obj.get("id") not in dataset["ID"].to_list(): # alimento non ancora mangiato nella settimana x
                 dataset = dataset.append(pd.DataFrame({"ID": [obj.get("id")],
@@ -323,6 +400,16 @@ def response(action):
 
     response = responseList[random.randint(0, 1)]  # imposto la risposta di default
 
+    firstCSV = reading(str(date.isocalendar(date.today())[1]) + 'First.csv')
+    secondCSV = reading(str(date.isocalendar(date.today())[1]) + 'Second.csv')
+    sideCSV = reading(str(date.isocalendar(date.today())[1]) + 'Side.csv')
+    fruitCSV = reading(str(date.isocalendar(date.today())[1]) + 'Fruit.csv')
+
+    print(firstCSV)
+    print(secondCSV)
+    print(sideCSV)
+    print(fruitCSV)
+
     listFirstDishes = firebaseList.get('first dishes')
     listSecondDishes = firebaseList.get('second dishes')
     listSideDishes = firebaseList.get('side dishes')
@@ -345,11 +432,16 @@ def response(action):
 
     cleanLast()
 
+    cleanList(firstCSV)
+    cleanList(secondCSV)
+    cleanList(sideCSV)
+    cleanList(fruitCSV)
+
     if len(typeOfMeal) == 1:
         if list.get('meal') in typeOfMeal:
             value = catResponse(True,
                                 response,
-                                str(date.isocalendar(date.today())[1]) + 'First.txt',
+                                str(date.isocalendar(date.today())[1]) + 'First.csv',
                                 listFirstDishes,
                                 elementFirstDishes)
 
@@ -360,7 +452,7 @@ def response(action):
 
             value = catResponse(True,
                                 response,
-                                str(date.isocalendar(date.today())[1]) + 'Second.txt',
+                                str(date.isocalendar(date.today())[1]) + 'Second.csv',
                                 listSecondDishes,
                                 elementSecondDishes)
 
@@ -369,7 +461,7 @@ def response(action):
 
             value = catResponse(True,
                                    response,
-                                   str(date.isocalendar(date.today())[1]) + 'Side.txt',
+                                   str(date.isocalendar(date.today())[1]) + 'Side.csv',
                                    listSideDishes,
                                    elementSideDishes)
 
@@ -378,7 +470,7 @@ def response(action):
 
             value = catResponse(True,
                                    response,
-                                   str(date.isocalendar(date.today())[1]) + 'Fruit.txt',
+                                   str(date.isocalendar(date.today())[1]) + 'Fruit.csv',
                                    listFruit,
                                    elementFruit)
 
@@ -388,7 +480,7 @@ def response(action):
         if list.get('single dish')[0] in typeOfMeal:
             value = catResponse(True,
                                    response,
-                                   str(date.isocalendar(date.today())[1]) + 'First.txt',
+                                   str(date.isocalendar(date.today())[1]) + 'First.csv',
                                    listFirstDishes,
                                    elementFirstDishes)
 
@@ -400,7 +492,7 @@ def response(action):
         if list.get('single dish')[1] in typeOfMeal:
             value = catResponse(True,
                                    response,
-                                   str(date.isocalendar(date.today())[1]) + 'Second.txt',
+                                   str(date.isocalendar(date.today())[1]) + 'Second.csv',
                                    listSecondDishes,
                                    elementSecondDishes)
 
@@ -412,7 +504,7 @@ def response(action):
         if list.get('single dish')[2] in typeOfMeal:
             value = catResponse(True,
                                    response,
-                                   str(date.isocalendar(date.today())[1]) + 'Side.txt',
+                                   str(date.isocalendar(date.today())[1]) + 'Side.csv',
                                    listSideDishes,
                                    elementSideDishes)
 
@@ -424,7 +516,7 @@ def response(action):
         if list.get('single dish')[3] in typeOfMeal:
             value = catResponse(True,
                                    response,
-                                   str(date.isocalendar(date.today())[1]) + 'Fruit.txt',
+                                   str(date.isocalendar(date.today())[1]) + 'Fruit.csv',
                                    listFruit,
                                    elementFruit)
 
@@ -438,7 +530,7 @@ def response(action):
             if list.get('single dish')[0] in typeOfMeal[i]:
                 value = catResponse(True,
                                        response,
-                                       str(date.isocalendar(date.today())[1]) + 'First.txt',
+                                       str(date.isocalendar(date.today())[1]) + 'First.csv',
                                        listFirstDishes,
                                        elementFirstDishes)
 
@@ -448,7 +540,7 @@ def response(action):
             if list.get('single dish')[1] in typeOfMeal[i]:
                 value = catResponse(True,
                                        response,
-                                       str(date.isocalendar(date.today())[1]) + 'Second.txt',
+                                       str(date.isocalendar(date.today())[1]) + 'Second.csv',
                                        listSecondDishes,
                                        elementSecondDishes)
 
@@ -458,7 +550,7 @@ def response(action):
             if list.get('single dish')[2] in typeOfMeal[i]:
                 value = catResponse(True,
                                        response,
-                                       str(date.isocalendar(date.today())[1]) + 'Side.txt',
+                                       str(date.isocalendar(date.today())[1]) + 'Side.csv',
                                        listSideDishes,
                                        elementSideDishes)
 
@@ -468,7 +560,7 @@ def response(action):
             if list.get('single dish')[3] in typeOfMeal[i]:
                 value = catResponse(True,
                                        response,
-                                       str(date.isocalendar(date.today())[1]) + 'Fruit.txt',
+                                       str(date.isocalendar(date.today())[1]) + 'Fruit.csv',
                                        listFruit,
                                        elementFruit)
 
@@ -506,7 +598,7 @@ def changeFood(action):
         if list.get('meal') in typeOfMeal:
             value = catResponse(False,
                                    response,
-                                   str(date.isocalendar(date.today())[1]) + 'First.txt',
+                                   str(date.isocalendar(date.today())[1]) + 'First.csv',
                                    listFirstDishes,
                                    None)
 
@@ -515,7 +607,7 @@ def changeFood(action):
 
             value = catResponse(False,
                                    response,
-                                   str(date.isocalendar(date.today())[1]) + 'Second.txt',
+                                   str(date.isocalendar(date.today())[1]) + 'Second.csv',
                                    listSecondDishes,
                                    None)
 
@@ -524,7 +616,7 @@ def changeFood(action):
 
             value = catResponse(False,
                                    response,
-                                   str(date.isocalendar(date.today())[1]) + 'Side.txt',
+                                   str(date.isocalendar(date.today())[1]) + 'Side.csv',
                                    listSideDishes,
                                    None)
 
@@ -533,7 +625,7 @@ def changeFood(action):
 
             value = catResponse(False,
                                    response,
-                                   str(date.isocalendar(date.today())[1]) + 'Fruit.txt',
+                                   str(date.isocalendar(date.today())[1]) + 'Fruit.csv',
                                    listFruit,
                                    None)
 
@@ -543,7 +635,7 @@ def changeFood(action):
         if list.get('single dish')[0] in typeOfMeal:
             value = catResponse(False,
                                    response,
-                                   str(date.isocalendar(date.today())[1]) + 'First.txt',
+                                   str(date.isocalendar(date.today())[1]) + 'First.csv',
                                    listFirstDishes,
                                    None)
 
@@ -555,7 +647,7 @@ def changeFood(action):
         if list.get('single dish')[1] in typeOfMeal:
             value = catResponse(False,
                                    response,
-                                   str(date.isocalendar(date.today())[1]) + 'Second.txt',
+                                   str(date.isocalendar(date.today())[1]) + 'Second.csv',
                                    listSecondDishes,
                                    None)
 
@@ -567,7 +659,7 @@ def changeFood(action):
         if list.get('single dish')[2] in typeOfMeal:
             value = catResponse(False,
                                    response,
-                                   str(date.isocalendar(date.today())[1]) + 'Side.txt',
+                                   str(date.isocalendar(date.today())[1]) + 'Side.csv',
                                    listSideDishes,
                                    None)
 
@@ -579,7 +671,7 @@ def changeFood(action):
         if list.get('single dish')[3] in typeOfMeal:
             value = catResponse(False,
                                    response,
-                                   str(date.isocalendar(date.today())[1]) + 'Fruit.txt',
+                                   str(date.isocalendar(date.today())[1]) + 'Fruit.csv',
                                    listFruit,
                                    None)
 
@@ -593,7 +685,7 @@ def changeFood(action):
             if list.get('single dish')[0] in typeOfMeal[i]:
                 value = catResponse(False,
                                        response,
-                                       str(date.isocalendar(date.today())[1]) + 'First.txt',
+                                       str(date.isocalendar(date.today())[1]) + 'First.csv',
                                        listFirstDishes,
                                        None)
 
@@ -603,7 +695,7 @@ def changeFood(action):
             if list.get('single dish')[1] in typeOfMeal[i]:
                 value = catResponse(False,
                                        response,
-                                       str(date.isocalendar(date.today())[1]) + 'Second.txt',
+                                       str(date.isocalendar(date.today())[1]) + 'Second.csv',
                                        listSecondDishes,
                                        None)
 
@@ -613,7 +705,7 @@ def changeFood(action):
             if list.get('single dish')[2] in typeOfMeal[i]:
                 value = catResponse(False,
                                        response,
-                                       str(date.isocalendar(date.today())[1]) + 'Side.txt',
+                                       str(date.isocalendar(date.today())[1]) + 'Side.csv',
                                        listSideDishes,
                                        None)
 
@@ -623,7 +715,7 @@ def changeFood(action):
             if list.get('single dish')[3] in typeOfMeal[i]:
                 value = catResponse(False,
                                        response,
-                                       str(date.isocalendar(date.today())[1]) + 'Fruit.txt',
+                                       str(date.isocalendar(date.today())[1]) + 'Fruit.csv',
                                        listFruit,
                                        None)
 
