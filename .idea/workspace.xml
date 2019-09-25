@@ -2,12 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="d667584a-6d6f-45f4-a7e7-04c14e759053" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/Tirocinio.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/Tirocinio.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/39First.txt" beforeDir="false" afterPath="$PROJECT_DIR$/39First.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/39Fruit.txt" beforeDir="false" afterPath="$PROJECT_DIR$/39Fruit.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/39Second.txt" beforeDir="false" afterPath="$PROJECT_DIR$/39Second.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/39Side.txt" beforeDir="false" afterPath="$PROJECT_DIR$/39Side.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/39First.csv" beforeDir="false" afterPath="$PROJECT_DIR$/39First.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/39Fruit.csv" beforeDir="false" afterPath="$PROJECT_DIR$/39Fruit.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/39Second.csv" beforeDir="false" afterPath="$PROJECT_DIR$/39Second.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/39Side.csv" beforeDir="false" afterPath="$PROJECT_DIR$/39Side.csv" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/app.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -17,23 +15,25 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="CoverageDataManager">
-    <SUITE FILE_PATH="coverage/Tirocinio$Tirocinio.coverage" NAME="Tirocinio Coverage Results" MODIFIED="1569358725838" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
+    <SUITE FILE_PATH="coverage/Tirocinio$Tirocinio.coverage" NAME="Tirocinio Coverage Results" MODIFIED="1569424232273" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/app.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="170">
-              <caret line="307" column="42" selection-start-line="307" selection-start-column="42" selection-end-line="307" selection-end-column="42" />
+            <state relative-caret-position="141">
+              <caret line="224" column="12" lean-forward="true" selection-start-line="224" selection-start-column="12" selection-end-line="224" selection-end-column="12" />
               <folding>
                 <element signature="e#0#27#0" expanded="true" />
-                <element signature="e#1003#1019#0" />
+                <element signature="e#1154#2964#0" />
+                <element signature="e#2992#3050#0" />
+                <element signature="e#3059#3242#0" />
                 <element signature="e#4169#4289#0" />
                 <element signature="e#4392#5158#0" />
-                <element signature="e#5330#6270#0" />
-                <element signature="e#6305#9139#0" />
-                <element signature="e#10201#10458#0" />
+                <element signature="e#10029#12617#0" />
+                <element signature="e#9204#13427#0" />
+                <element signature="e#10970#11747#0" />
               </folding>
             </state>
           </provider>
@@ -41,41 +41,29 @@
       </file>
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/39First.csv">
-          <provider editor-type-id="csv-text-editor">
-            <state relative-caret-position="75">
-              <caret line="5" lean-forward="true" selection-start-line="5" selection-end-line="5" />
-            </state>
-          </provider>
-          <provider selected="true" editor-type-id="csv-table-editor">
-            <state showInfoPanel="true" fixedHeaders="true" autoColumnWidthOnOpen="true" rowLines="0">
-              <column index="0" width="100" />
-              <column index="1" width="100" />
-              <column index="2" width="100" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/setUp.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="30">
-              <caret line="2" column="13" selection-start-line="2" selection-start-column="13" selection-end-line="2" selection-end-column="13" />
-              <folding>
-                <element signature="e#0#29#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/file.csv">
-          <provider editor-type-id="csv-text-editor">
+          <provider selected="true" editor-type-id="csv-text-editor">
             <state relative-caret-position="150">
               <caret line="10" lean-forward="true" selection-start-line="10" selection-end-line="10" />
             </state>
           </provider>
-          <provider selected="true" editor-type-id="csv-table-editor">
-            <state showInfoPanel="true" fixedHeaders="true" autoColumnWidthOnOpen="false" rowLines="0">
+          <provider editor-type-id="csv-table-editor">
+            <state showInfoPanel="true" fixedHeaders="true" autoColumnWidthOnOpen="true" rowLines="0">
+              <column index="0" width="22" />
+              <column index="1" width="36" />
+              <column index="2" width="36" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/39Second.csv">
+          <provider selected="true" editor-type-id="csv-text-editor">
+            <state relative-caret-position="105">
+              <caret line="7" lean-forward="true" selection-start-line="7" selection-end-line="7" />
+            </state>
+          </provider>
+          <provider editor-type-id="csv-table-editor">
+            <state showInfoPanel="true" fixedHeaders="false" rowLines="3">
               <column index="0" width="100" />
               <column index="1" width="100" />
               <column index="2" width="100" />
@@ -84,31 +72,31 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/39First.txt">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="135">
-              <caret line="10" selection-start-line="10" selection-end-line="10" />
+        <entry file="file://$PROJECT_DIR$/39Side.csv">
+          <provider selected="true" editor-type-id="csv-text-editor" />
+          <provider editor-type-id="csv-table-editor">
+            <state showInfoPanel="true" fixedHeaders="false" rowLines="3">
+              <column index="0" width="100" />
+              <column index="1" width="100" />
+              <column index="2" width="100" />
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/39Second.txt">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="30">
-              <caret line="2" selection-start-line="2" selection-end-line="2" />
+        <entry file="file://$PROJECT_DIR$/39Fruit.csv">
+          <provider selected="true" editor-type-id="csv-text-editor">
+            <state relative-caret-position="60">
+              <caret line="4" lean-forward="true" selection-start-line="4" selection-end-line="4" />
             </state>
           </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/39Side.txt">
-          <provider selected="true" editor-type-id="text-editor" />
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/39Fruit.txt">
-          <provider selected="true" editor-type-id="text-editor" />
+          <provider editor-type-id="csv-table-editor">
+            <state showInfoPanel="true" fixedHeaders="false" rowLines="3">
+              <column index="0" width="100" />
+              <column index="1" width="100" />
+              <column index="2" width="100" />
+            </state>
+          </provider>
         </entry>
       </file>
     </leaf>
@@ -152,6 +140,10 @@
         <option value="$PROJECT_DIR$/39Side.txt" />
         <option value="$PROJECT_DIR$/39Fruit.txt" />
         <option value="$PROJECT_DIR$/file.csv" />
+        <option value="$PROJECT_DIR$/39First.csv" />
+        <option value="$PROJECT_DIR$/39Fruit.csv" />
+        <option value="$PROJECT_DIR$/39Side.csv" />
+        <option value="$PROJECT_DIR$/39Second.csv" />
         <option value="$PROJECT_DIR$/app.py" />
       </list>
     </option>
@@ -249,12 +241,12 @@
       <updated>1568140743961</updated>
       <workItem from="1568140745512" duration="62889000" />
       <workItem from="1568995154979" duration="18586000" />
-      <workItem from="1569333809148" duration="7596000" />
+      <workItem from="1569333809148" duration="20156000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="89071000" />
+    <option name="totallyTimeSpent" value="101631000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="23" width="1680" height="981" extended-state="6" />
@@ -264,10 +256,10 @@
       <window_info content_ui="combo" id="Project" order="1" visible="true" weight="0.21428572" />
       <window_info id="Structure" order="2" side_tool="true" weight="0.25" />
       <window_info anchor="bottom" id="Database Changes" order="0" />
-      <window_info anchor="bottom" id="Terminal" order="1" sideWeight="0.498779" weight="0.32733408" />
+      <window_info active="true" anchor="bottom" id="Terminal" order="1" sideWeight="0.498779" visible="true" weight="0.115860514" />
       <window_info anchor="bottom" id="Event Log" order="2" sideWeight="0.501221" side_tool="true" weight="0.36107987" />
       <window_info anchor="bottom" id="Version Control" order="3" sideWeight="0.498779" weight="0.3295838" />
-      <window_info active="true" anchor="bottom" id="Python Console" order="4" sideWeight="0.498779" visible="true" weight="0.3295838" />
+      <window_info anchor="bottom" id="Python Console" order="4" sideWeight="0.498779" weight="0.3295838" />
       <window_info anchor="bottom" id="Docker" order="5" show_stripe_button="false" />
       <window_info anchor="bottom" id="Message" order="6" />
       <window_info anchor="bottom" id="Find" order="7" />
@@ -286,6 +278,17 @@
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="1" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/app.py</url>
+          <line>372</line>
+          <option name="timeStamp" value="6" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
   <component name="editorHistoryManager">
     <entry file="file://$USER_HOME$/Downloads/luchino.py">
@@ -431,32 +434,72 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/39First.csv">
-      <provider editor-type-id="csv-text-editor">
-        <state relative-caret-position="75">
-          <caret line="5" lean-forward="true" selection-start-line="5" selection-end-line="5" />
+    <entry file="file://$PROJECT_DIR$/39Fruit.csv">
+      <provider selected="true" editor-type-id="csv-text-editor">
+        <state relative-caret-position="60">
+          <caret line="4" lean-forward="true" selection-start-line="4" selection-end-line="4" />
         </state>
       </provider>
-      <provider selected="true" editor-type-id="csv-table-editor">
-        <state showInfoPanel="true" fixedHeaders="true" autoColumnWidthOnOpen="true" rowLines="0">
+      <provider editor-type-id="csv-table-editor">
+        <state showInfoPanel="true" fixedHeaders="false" rowLines="3">
           <column index="0" width="100" />
           <column index="1" width="100" />
           <column index="2" width="100" />
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/39Side.csv">
+      <provider selected="true" editor-type-id="csv-text-editor" />
+      <provider editor-type-id="csv-table-editor">
+        <state showInfoPanel="true" fixedHeaders="false" rowLines="3">
+          <column index="0" width="100" />
+          <column index="1" width="100" />
+          <column index="2" width="100" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/39Second.csv">
+      <provider selected="true" editor-type-id="csv-text-editor">
+        <state relative-caret-position="105">
+          <caret line="7" lean-forward="true" selection-start-line="7" selection-end-line="7" />
+        </state>
+      </provider>
+      <provider editor-type-id="csv-table-editor">
+        <state showInfoPanel="true" fixedHeaders="false" rowLines="3">
+          <column index="0" width="100" />
+          <column index="1" width="100" />
+          <column index="2" width="100" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/39First.csv">
+      <provider selected="true" editor-type-id="csv-text-editor">
+        <state relative-caret-position="150">
+          <caret line="10" lean-forward="true" selection-start-line="10" selection-end-line="10" />
+        </state>
+      </provider>
+      <provider editor-type-id="csv-table-editor">
+        <state showInfoPanel="true" fixedHeaders="true" autoColumnWidthOnOpen="true" rowLines="0">
+          <column index="0" width="22" />
+          <column index="1" width="36" />
+          <column index="2" width="36" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/app.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="170">
-          <caret line="307" column="42" selection-start-line="307" selection-start-column="42" selection-end-line="307" selection-end-column="42" />
+        <state relative-caret-position="141">
+          <caret line="224" column="12" lean-forward="true" selection-start-line="224" selection-start-column="12" selection-end-line="224" selection-end-column="12" />
           <folding>
             <element signature="e#0#27#0" expanded="true" />
-            <element signature="e#1003#1019#0" />
+            <element signature="e#1154#2964#0" />
+            <element signature="e#2992#3050#0" />
+            <element signature="e#3059#3242#0" />
             <element signature="e#4169#4289#0" />
             <element signature="e#4392#5158#0" />
-            <element signature="e#5330#6270#0" />
-            <element signature="e#6305#9139#0" />
-            <element signature="e#10201#10458#0" />
+            <element signature="e#10029#12617#0" />
+            <element signature="e#9204#13427#0" />
+            <element signature="e#10970#11747#0" />
           </folding>
         </state>
       </provider>
