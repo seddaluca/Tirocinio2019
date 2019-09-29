@@ -93,6 +93,9 @@ def results():
     if (action.get('action') == 'input.change'):
         return {'fulfillmentText': changeFood(action)}
 
+    if (action.get('action') == 'input.reminder'):
+        return {'fulfillmentText': reminder(action)}
+
 def reading(file):
     list = []
 
@@ -493,7 +496,7 @@ def response(action):
             else:
                 response += ', ' + responseListFood[i]
 
-        return response + "."
+        return response + ". It's ok?"
 
     return "My work is done, you've already eatten."
 
@@ -514,7 +517,8 @@ def changeFood(action):
     listSideDishes = firebaseList.get('side dishes')
     listFruit = firebaseList.get('fruit')
 
-    if (action.get('parameters').get('Boolean') == 'No' and len(typeOfMeal) > 0):
+    if (action.get('parameters').get('Boolean') == 'No' and len(typeOfMeal) > 0) \
+            or (len(action.get('parameters').get('Boolean')) == 0 and len(typeOfMeal) > 0):
         if len(typeOfMeal) == 1:
             if listMeal.get('meal') in typeOfMeal:
                 value = checkDish(False,
@@ -552,7 +556,7 @@ def changeFood(action):
                                        listFruit,
                                        None)
 
-                firstCSV = value[0]
+                fruitCSV = value[0]
 
                 if value[2] == True:
                     responseListFood.append(value[1])
@@ -678,10 +682,91 @@ def changeFood(action):
                     response += ', ' + responseListFood[i]
 
             return response + "."
+
     elif (action.get('parameters').get('Boolean') == 'No' and len(typeOfMeal) == 0):
-        return 
+        return "Can you tell me what do you change?"
+    elif (action.get('parameters').get('Boolean') == 'Yes' and len(typeOfMeal) == 0):
+        return "Enjoy your meal!"
 
     return "My work is done, you've already eatten."
+
+def manageReminder(listCSV):
+    data = max(listCSV, key=lambda item:item['Last'])
+
+    if int(data.get('Last')) != 0:
+        return (int(data.get('ID')), True)
+
+    return (None, False)
+
+def checkReminder(listCSV, listFood):
+    value = manageReminder(listCSV)
+
+    if value == (None, False):
+        return (None, False)
+
+    else:
+        element = listFood.__getitem__(value[0]).get(value[0])  # prendo il secondo valore della coppia -> value[1]
+        return (element.get("name") + ' (' + str(element.get("calories")) + ' kcal)', True)
+
+def reminder(action):
+    responseListFood = []
+
+    response = "You ate in your last meal "
+
+    firstCSV = reading(str(date.isocalendar(date.today())[1]) + 'First.csv')
+    secondCSV = reading(str(date.isocalendar(date.today())[1]) + 'Second.csv')
+    sideCSV = reading(str(date.isocalendar(date.today())[1]) + 'Side.csv')
+    fruitCSV = reading(str(date.isocalendar(date.today())[1]) + 'Fruit.csv')
+
+    listFirstDishes = firebaseList.get('first dishes')
+    listSecondDishes = firebaseList.get('second dishes')
+    listSideDishes = firebaseList.get('side dishes')
+    listFruit = firebaseList.get('fruit')
+
+    if len(firstCSV) > 0:
+        value = checkReminder(firstCSV,
+                              listFirstDishes)
+
+        if value != (None, False):
+            responseListFood.append(value[0])
+
+    if len(secondCSV) > 0:
+        value = checkReminder(secondCSV,
+                              listSecondDishes)
+
+        if value != (None, False):
+            responseListFood.append(value[0])
+
+    if len(sideCSV) > 0:
+        value = checkReminder(sideCSV,
+                              listSideDishes)
+
+        if value != (None, False):
+            responseListFood.append(value[0])
+
+    if len(fruitCSV) > 0:
+        value = checkReminder(fruitCSV,
+                              listFruit)
+
+        if value != (None, False):
+            responseListFood.append(value[0])
+
+    if len(responseListFood) == 0:
+        return "You can't get this information"
+
+    elif len(responseListFood) == 1:
+        return response + responseListFood[0]
+
+    elif len(responseListFood) > 1:
+        for i in range(0, len(responseListFood)):
+            if i == 0:
+                response += responseListFood[i]
+            elif i == len(responseListFood) - 1:
+                response += ' and ' + responseListFood[i]
+            else:
+                response += ', ' + responseListFood[i]
+
+        return response + "."
 
 # run the app
 if __name__ == '__main__':
