@@ -59,6 +59,7 @@ firebaseList = {
         1: {"id": 1, "take": 11, "calories": 18, "name": "tomato"}
     }]
 }
+
 responseList = ['I suggest you ',
                     'I recommend you ']
 
@@ -73,6 +74,11 @@ listMeal = {'meal': 'meal',
 @app.route('/')
 def index():
     return 'Hello World!'
+
+# create a route for webhook
+@app.route('/webhook', methods=['GET', 'POST'])
+def webhook():
+    return make_response(jsonify(results())) # return response
 
 # function for responses
 def results():
@@ -91,11 +97,15 @@ def results():
         return {'fulfillmentText': response(action)}
 
     if (action.get('action') == 'input.change'):
-        return {'fulfillmentText': changeFood(action)}
+        return {'fulfillmentText': responseChange(action)}
 
     if (action.get('action') == 'input.reminder'):
         return {'fulfillmentText': reminder(action)}
 
+'''
+    Function 'reading' return a list than contains the value of file
+        - file
+'''
 def reading(file):
     list = []
 
@@ -121,6 +131,11 @@ def reading(file):
 
     return []
 
+'''
+    Function 'writing'
+        - name: name file
+        - list: list that contains the values of side
+'''
 def writing(name, list):
 
     with open(name, 'w', newline='') as f:
@@ -129,11 +144,10 @@ def writing(name, list):
         for i in range(0, len(list)):
             writer.writerow([list[i].get('ID'), list[i].get('Take'), list[i].get('Last')])
 
-# create a route for webhook
-@app.route('/webhook', methods=['GET', 'POST'])
-def webhook():
-    return make_response(jsonify(results())) # return response
-
+'''
+    Function 'cleanList' clean write value 0 in column Last
+        - list: list to clean
+'''
 def cleanList(list):
     if len(list) > 0:
         for i in range(0, len(list)):
@@ -141,6 +155,13 @@ def cleanList(list):
 
     return list
 
+'''
+    Function 'checkDish' return a tuple (list, int, boolean)
+        - new: this boolean explain if the user request new meal or change a meal 
+        - listCSV: list of value
+        - listFoof: this list contains the food can the user eat
+        - obj: predicted food
+'''
 def checkDish(new, listCSV, listFood, element):
     if new:
         value = manageDish(listCSV, listFood, element)
@@ -165,6 +186,12 @@ def checkDish(new, listCSV, listFood, element):
             element = listFood.__getitem__(value[1]).get(value[1])
             return (value[0], element.get("name") + ' (' + str(element.get("calories")) + ' kcal)', True)
 
+'''
+    Function 'manageDish' return a tuple (list, int, boolean)
+        - listCSV: list of value
+        - listFoof: this list contains the food can the user eat
+        - obj: predicted food
+'''
 def manageDish(listCSV, listFood, obj):
     listManage = []
 
@@ -221,70 +248,10 @@ def manageDish(listCSV, listFood, obj):
 
     return (listCSV, None, True)
 
-def manageChangeDish(listCSV, listFood):
-    listManage = []
-
-    for i in range(0, len(listCSV)):
-        listManage.append(listCSV[i].get("ID"))
-
-    if len(listCSV) == 0:
-        return (listCSV, None, False)
-    elif len(listCSV) > 0:
-        old = max(listCSV, key=lambda item: item['Last'])
-
-        print("old: " + str(old))
-
-        if int(old.get('Last')) == 1:
-            if len(listFood) > len(listCSV):
-                while True:  # do-while: restituisco un prodotto diverso dal precedente e non ancora proposto
-                    value = random.randint(0, (len(listFood) - 1))
-
-                    if value != int(old.get("ID")) and str(value) not in listManage:
-                        break
-
-                for i in range(0, len(listFood)):  # prelevo l'elemento dalla lista
-                    if value == listFood[i].__getitem__(i).get('id'):
-                        obj = listFood[i].__getitem__(i)
-
-                data = {'ID': int(obj.get('id')),
-                        'Take': int(obj.get('take')) - 1,
-                        'Last': 1}
-
-                listCSV.append(data)
-
-                for i in range(0, len(listCSV)):
-                    if int(old.get('ID')) == int(listCSV[i].get('ID')):
-                        listCSV[i].update({'Take': int(listCSV[i].get('Take')) + 1,
-                                               'Last': 0})
-
-                return (listCSV, int(obj.get("id")), False)  # --> cambiare il secondo parametro
-
-            elif len(listFood) == len(listCSV):
-                index = 0
-
-                for i in range(0, len(listCSV)):
-                    if old.get('ID') == listCSV[i].get('ID'):
-                        index = i
-                        break
-
-                data = random.choice(list(filter(lambda x: int(x['Take']) > 0,
-                                                 (filter(lambda x: int(x['ID']) != int(old.get('ID')), listCSV)))))
-
-                if data != []:
-                    for i in range(0, len(listCSV)):
-                        if int(data.get('ID')) == int(listCSV[i].get('ID')):
-                            listCSV[i].update({'Take': int(listCSV[i].get('Take')) - 1,
-                                               'Last': 1})
-
-                            listCSV[index].update({'Take': int(listCSV[index].get('Take')) + 1,
-                                                   'Last': 0})
-
-                            return (listCSV, int(listCSV[i].get('ID')), True)
-
-                return (listCSV, index, False)
-
-    return (listCSV, None, False)
-
+'''
+    Function 'response' return the meal
+        - action: dictionary with the request
+'''
 def response(action):
     responseListFood  = []
 
@@ -500,7 +467,86 @@ def response(action):
 
     return "My work is done, you've already eatten."
 
-def changeFood(action):
+'''
+    Function 'manageChangeDish' return a tuple (list, int, boolean)
+        - listCSV: list of value
+        - listFoof: this list contains the food can the user eat
+'''
+def manageChangeDish(listCSV, listFood):
+    listManage = []
+
+    for i in range(0, len(listCSV)):
+        listManage.append(listCSV[i].get("ID"))
+
+    if len(listCSV) == 0:
+        return (listCSV, None, False)
+    elif len(listCSV) > 0:
+        old = max(listCSV, key=lambda item: item['Last'])
+
+        print("old: " + str(old))
+
+        if int(old.get('Last')) == 1:
+            if len(listFood) > len(listCSV):
+                while True:  # do-while: restituisco un prodotto diverso dal precedente e non ancora proposto
+                    value = random.randint(0, (len(listFood) - 1))
+
+                    if value != int(old.get("ID")) and str(value) not in listManage:
+                        break
+
+                for i in range(0, len(listFood)):  # prelevo l'elemento dalla lista
+                    if value == listFood[i].__getitem__(i).get('id'):
+                        obj = listFood[i].__getitem__(i)
+
+                data = {'ID': int(obj.get('id')),
+                        'Take': int(obj.get('take')) - 1,
+                        'Last': 1}
+
+                listCSV.append(data)
+
+                for i in range(0, len(listCSV)):
+                    if int(old.get('ID')) == int(listCSV[i].get('ID')):
+                        listCSV[i].update({'Take': int(listCSV[i].get('Take')) + 1,
+                                               'Last': 0})
+
+                return (listCSV, int(obj.get("id")), False)  # --> cambiare il secondo parametro
+
+            elif len(listFood) == len(listCSV):
+                index = 0
+
+                for i in range(0, len(listCSV)):
+                    if old.get('ID') == listCSV[i].get('ID'):
+                        index = i
+                        break
+
+                if len(list(filter(lambda x: int(x['Take']) > 0,
+                                                 (filter(lambda x: int(x['ID']) != int(old.get('ID')), listCSV))))) > 0:
+
+                    data = random.choice(list(filter(lambda x: int(x['Take']) > 0,
+                                                     (filter(lambda x: int(x['ID']) != int(old.get('ID')), listCSV)))))
+
+                    if data != []:
+                        for i in range(0, len(listCSV)):
+                            if int(data.get('ID')) == int(listCSV[i].get('ID')):
+                                listCSV[i].update({'Take': int(listCSV[i].get('Take')) - 1,
+                                                   'Last': 1})
+
+                                listCSV[index].update({'Take': int(listCSV[index].get('Take')) + 1,
+                                                       'Last': 0})
+
+                                return (listCSV, int(listCSV[i].get('ID')), True)
+
+                    return (listCSV, index, False)
+
+                else:
+                    return (listCSV, index, False)
+
+    return (listCSV, None, False)
+
+'''
+    Function 'responseChange' return the meal when the user request the change
+        - action: dictionary with the request
+'''
+def responseChange(action):
     responseListFood = []
 
     typeOfMeal = action.get('parameters').get('TypeOfMeal')
@@ -690,6 +736,10 @@ def changeFood(action):
 
     return "My work is done, you've already eatten."
 
+'''
+    Function 'manageReminder' return a couple (int, boolean)
+        - listCSV: list of food 
+'''
 def manageReminder(listCSV):
     data = max(listCSV, key=lambda item:item['Last'])
 
@@ -698,6 +748,11 @@ def manageReminder(listCSV):
 
     return (None, False)
 
+'''
+    Function 'checkReminder' return a couple (string, boolean)
+        - listCSV: list of value
+        - listFoof: this list contains the food can the user eat
+'''
 def checkReminder(listCSV, listFood):
     value = manageReminder(listCSV)
 
@@ -708,6 +763,10 @@ def checkReminder(listCSV, listFood):
         element = listFood.__getitem__(value[0]).get(value[0])  # prendo il secondo valore della coppia -> value[1]
         return (element.get("name") + ' (' + str(element.get("calories")) + ' kcal)', True)
 
+'''
+    Function 'reminder' return the last meal 
+        - action: dictionary with the request
+'''
 def reminder(action):
     responseListFood = []
 
