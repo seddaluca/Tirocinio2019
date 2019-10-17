@@ -3,9 +3,9 @@ from flask import Flask, request, make_response, jsonify
 from datetime import date
 
 import csv
-
 import random
 import pandas as pd
+import os
 
 # initialize the flask app
 app = Flask(__name__)
@@ -70,6 +70,12 @@ listMeal = {'meal': 'meal',
                             'fruit']
             } # lista di supporto per suddividere le tipologie di pasti
 
+listAction = {
+    'request': ['request', 'no', 'reminder'],
+    'no': ['reminder', 'request'],
+    'reminder': ['reminder', 'request']
+}
+
 # default route
 @app.route('/')
 def index():
@@ -110,7 +116,7 @@ def reading(file):
     list = []
 
     try:
-        with open(file, newline='') as f:
+        with open('/Users/lucasedda/Desktop/Tirocinio/cvs/'+file, newline='') as f:
             reader = csv.reader(f)
             i = -1
             for row in reader:
@@ -131,14 +137,55 @@ def reading(file):
 
     return []
 
+# function for manage dataset
+def writeLogger(file, action):
+    try: # file esiste
+        try: # file esiste e contiene minimo una riga
+            dataset = pd.read_csv(file, sep=",", error_bad_lines=False)  # Leggo tutto il file
+            dataset = dataset.append(pd.DataFrame({"Action": [str(action)]}), ignore_index=True)
+            dataset.to_csv(index=False, path_or_buf=file)
+
+        except pd.errors.EmptyDataError: # eccezione nel caso il file sia vuoto
+            dataset = pd.DataFrame(pd.DataFrame({"Action": [str(action)]}))
+            dataset.to_csv(index=False, path_or_buf=file)
+
+    except FileNotFoundError: # eccezione nel caso non venga trovato il file
+            dataset = pd.DataFrame(pd.DataFrame({"Action": [str(action)]}))
+            dataset.to_csv(index=False, path_or_buf=file)
+
+def readLogger(file, action):
+    try:  # file esiste
+        try:  # file esiste e contiene minimo una riga
+            dataset = pd.read_csv(file, sep=",", error_bad_lines=False)  # Leggo tutto il file
+            index = len(dataset.index) - 1
+
+            if action in listAction.get(dataset.iloc[index]['Action']):
+                return True
+            else:
+                return False
+
+        except pd.errors.EmptyDataError:  # eccezione nel caso il file sia vuoto
+            if action == 'request':
+                return True
+
+    except FileNotFoundError:  # eccezione nel caso non venga trovato il file
+        if action == 'request':
+            return True
+
+    return False
+
 '''
     Function 'writing'
         - name: name file
         - list: list that contains the values of side
 '''
 def writing(name, list):
+    try:
+        os.mkdir('/Users/lucasedda/Desktop/Tirocinio/cvs')
+    except OSError:
+        ""
 
-    with open(name, 'w', newline='') as f:
+    with open('/Users/lucasedda/Desktop/Tirocinio/cvs/'+name, 'w', newline='') as f:
         writer = csv.writer(f)
         writer.writerow(["ID", "Take", "Last"])
         for i in range(0, len(list)):
@@ -253,181 +300,72 @@ def manageDish(listCSV, listFood, obj):
         - action: dictionary with the request
 '''
 def response(action):
-    responseListFood  = []
+    try:
+        os.mkdir('/Users/lucasedda/Desktop/Tirocinio/cvs')
+    except OSError:
+        ""
 
-    typeOfMeal = action.get('parameters').get('TypeOfMeal')
+    print(readLogger('Logger.txt', 'request'))
 
-    response = responseList[random.randint(0, 1)]  # imposto la risposta di default
+    if readLogger('Logger.txt', 'request') == True:
+        responseListFood  = []
 
-    firstCSV = reading(str(date.isocalendar(date.today())[1]) + 'First.csv')
-    secondCSV = reading(str(date.isocalendar(date.today())[1]) + 'Second.csv')
-    sideCSV = reading(str(date.isocalendar(date.today())[1]) + 'Side.csv')
-    fruitCSV = reading(str(date.isocalendar(date.today())[1]) + 'Fruit.csv')
+        typeOfMeal = action.get('parameters').get('TypeOfMeal')
 
-    listFirstDishes = firebaseList.get('first dishes')
-    listSecondDishes = firebaseList.get('second dishes')
-    listSideDishes = firebaseList.get('side dishes')
-    listFruit = firebaseList.get('fruit')
+        response = responseList[random.randint(0, 1)]  # imposto la risposta di default
 
-    lenListFirstDishes = len(listFirstDishes) - 1
-    lenListSecondDishes = len(listSecondDishes) - 1
-    lenListSideDishes = len(listSideDishes) - 1
-    lenListFruit = len(listFruit) - 1
+        firstCSV = reading(str(date.isocalendar(date.today())[1]) + 'First.csv')
+        secondCSV = reading(str(date.isocalendar(date.today())[1]) + 'Second.csv')
+        sideCSV = reading(str(date.isocalendar(date.today())[1]) + 'Side.csv')
+        fruitCSV = reading(str(date.isocalendar(date.today())[1]) + 'Fruit.csv')
 
-    firstDishes = random.randint(0, lenListFirstDishes)
-    secondDishes = random.randint(0, lenListSecondDishes)
-    sideDishes = random.randint(0, lenListSideDishes)
-    fruit = random.randint(0, lenListFruit)
+        listFirstDishes = firebaseList.get('first dishes')
+        listSecondDishes = firebaseList.get('second dishes')
+        listSideDishes = firebaseList.get('side dishes')
+        listFruit = firebaseList.get('fruit')
 
-    elementFirstDishes = listFirstDishes.__getitem__(firstDishes).get(firstDishes)
-    elementSecondDishes = listSecondDishes.__getitem__(secondDishes).get(secondDishes)
-    elementSideDishes = listSideDishes.__getitem__(sideDishes).get(sideDishes)
-    elementFruit = listFruit.__getitem__(fruit).get(fruit)
+        lenListFirstDishes = len(listFirstDishes) - 1
+        lenListSecondDishes = len(listSecondDishes) - 1
+        lenListSideDishes = len(listSideDishes) - 1
+        lenListFruit = len(listFruit) - 1
 
-    cleanList(firstCSV)
-    cleanList(secondCSV)
-    cleanList(sideCSV)
-    cleanList(fruitCSV)
+        firstDishes = random.randint(0, lenListFirstDishes)
+        secondDishes = random.randint(0, lenListSecondDishes)
+        sideDishes = random.randint(0, lenListSideDishes)
+        fruit = random.randint(0, lenListFruit)
 
-    if len(typeOfMeal) == 1:
-        if listMeal.get('meal') in typeOfMeal:
-            value = checkDish(True,
-                                firstCSV,
-                                listFirstDishes,
-                                elementFirstDishes)
+        elementFirstDishes = listFirstDishes.__getitem__(firstDishes).get(firstDishes)
+        elementSecondDishes = listSecondDishes.__getitem__(secondDishes).get(secondDishes)
+        elementSideDishes = listSideDishes.__getitem__(sideDishes).get(sideDishes)
+        elementFruit = listFruit.__getitem__(fruit).get(fruit)
 
-            firstCSV = value[0]
+        cleanList(firstCSV)
+        cleanList(secondCSV)
+        cleanList(sideCSV)
+        cleanList(fruitCSV)
 
-            if value[2] == True:
-                responseListFood.append(value[1])
-
-            value = checkDish(True,
-                                secondCSV,
-                                listSecondDishes,
-                                elementSecondDishes)
-
-            secondCSV = value[0]
-
-            if value[2] == True:
-                responseListFood.append(value[1])
-
-            value = checkDish(True,
-                                   sideCSV,
-                                   listSideDishes,
-                                   elementSideDishes)
-
-            sideCSV = value[0]
-
-            if value[2] == True:
-                responseListFood.append(value[1])
-
-            value = checkDish(True,
-                                   fruitCSV,
-                                   listFruit,
-                                   elementFruit)
-
-            fruitCSV = value[0]
-
-            if value[2] == True:
-                responseListFood.append(value[1])
-
-        if listMeal.get('single dish')[0] in typeOfMeal:
-            value = checkDish(True,
-                                   firstCSV,
-                                   listFirstDishes,
-                                   elementFirstDishes)
-
-            firstCSV = value[0]
-
-            writing(str(date.isocalendar(date.today())[1]) + 'First.csv', firstCSV)
-            writing(str(date.isocalendar(date.today())[1]) + 'Second.csv', secondCSV)
-            writing(str(date.isocalendar(date.today())[1]) + 'Side.csv', sideCSV)
-            writing(str(date.isocalendar(date.today())[1]) + 'Fruit.csv', fruitCSV)
-
-            if value[2] == True:
-                return response + value[1] + ". It's ok?"
-            else:
-                return "My work is done, you've already eatten."
-
-        if listMeal.get('single dish')[1] in typeOfMeal:
-            value = checkDish(True,
-                                   secondCSV,
-                                   listSecondDishes,
-                                   elementSecondDishes)
-
-            secondCSV = value[0]
-
-            writing(str(date.isocalendar(date.today())[1]) + 'First.csv', firstCSV)
-            writing(str(date.isocalendar(date.today())[1]) + 'Second.csv', secondCSV)
-            writing(str(date.isocalendar(date.today())[1]) + 'Side.csv', sideCSV)
-            writing(str(date.isocalendar(date.today())[1]) + 'Fruit.csv', fruitCSV)
-
-            if value[2] == True:
-                return response + value[1] + ". It's ok?"
-            else:
-                return "My work is done, you've already eatten."
-
-        if listMeal.get('single dish')[2] in typeOfMeal:
-            value = checkDish(True,
-                                   sideCSV,
-                                   listSideDishes,
-                                   elementSideDishes)
-
-            sideCSV = value[0]
-
-            writing(str(date.isocalendar(date.today())[1]) + 'First.csv', firstCSV)
-            writing(str(date.isocalendar(date.today())[1]) + 'Second.csv', secondCSV)
-            writing(str(date.isocalendar(date.today())[1]) + 'Side.csv', sideCSV)
-            writing(str(date.isocalendar(date.today())[1]) + 'Fruit.csv', fruitCSV)
-
-            if value[2] == True:
-                return response + value[1] + ". It's ok?"
-            else:
-                return "My work is done, you've already eatten."
-
-        if listMeal.get('single dish')[3] in typeOfMeal:
-            value = checkDish(True,
-                                   fruitCSV,
-                                   listFruit,
-                                   elementFruit)
-
-            fruitCSV = value[0]
-
-            writing(str(date.isocalendar(date.today())[1]) + 'First.csv', firstCSV)
-            writing(str(date.isocalendar(date.today())[1]) + 'Second.csv', secondCSV)
-            writing(str(date.isocalendar(date.today())[1]) + 'Side.csv', sideCSV)
-            writing(str(date.isocalendar(date.today())[1]) + 'Fruit.csv', fruitCSV)
-
-            if value[2] == True:
-                return response + value[1] + ". It's ok?"
-            else:
-                return "My work is done, you've already eatten."
-
-    if len(typeOfMeal) > 1:
-        for i in range(0, len(typeOfMeal)):
-            if listMeal.get('single dish')[0] in typeOfMeal[i]:
+        if len(typeOfMeal) == 1:
+            if listMeal.get('meal') in typeOfMeal:
                 value = checkDish(True,
-                                       firstCSV,
-                                       listFirstDishes,
-                                       elementFirstDishes)
+                                    firstCSV,
+                                    listFirstDishes,
+                                    elementFirstDishes)
 
                 firstCSV = value[0]
 
                 if value[2] == True:
                     responseListFood.append(value[1])
 
-            if listMeal.get('single dish')[1] in typeOfMeal[i]:
                 value = checkDish(True,
-                                       secondCSV,
-                                       listSecondDishes,
-                                       elementSecondDishes)
+                                    secondCSV,
+                                    listSecondDishes,
+                                    elementSecondDishes)
 
                 secondCSV = value[0]
 
                 if value[2] == True:
                     responseListFood.append(value[1])
 
-            if listMeal.get('single dish')[2] in typeOfMeal[i]:
                 value = checkDish(True,
                                        sideCSV,
                                        listSideDishes,
@@ -438,7 +376,6 @@ def response(action):
                 if value[2] == True:
                     responseListFood.append(value[1])
 
-            if listMeal.get('single dish')[3] in typeOfMeal[i]:
                 value = checkDish(True,
                                        fruitCSV,
                                        listFruit,
@@ -449,23 +386,149 @@ def response(action):
                 if value[2] == True:
                     responseListFood.append(value[1])
 
-    writing(str(date.isocalendar(date.today())[1])+'First.csv', firstCSV)
-    writing(str(date.isocalendar(date.today())[1])+'Second.csv', secondCSV)
-    writing(str(date.isocalendar(date.today())[1])+'Side.csv', sideCSV)
-    writing(str(date.isocalendar(date.today())[1])+'Fruit.csv', fruitCSV)
+            if listMeal.get('single dish')[0] in typeOfMeal:
+                value = checkDish(True,
+                                       firstCSV,
+                                       listFirstDishes,
+                                       elementFirstDishes)
 
-    if len(responseListFood) > 0:
-        for i in range (0, len(responseListFood)):
-            if i == 0:
-                response += responseListFood[i]
-            elif i == len(responseListFood) - 1:
-                response += ' and ' + responseListFood[i]
-            else:
-                response += ', ' + responseListFood[i]
+                firstCSV = value[0]
 
-        return response + ". It's ok?"
+                writing(str(date.isocalendar(date.today())[1]) + 'First.csv', firstCSV)
+                writing(str(date.isocalendar(date.today())[1]) + 'Second.csv', secondCSV)
+                writing(str(date.isocalendar(date.today())[1]) + 'Side.csv', sideCSV)
+                writing(str(date.isocalendar(date.today())[1]) + 'Fruit.csv', fruitCSV)
 
-    return "My work is done, you've already eatten."
+                if value[2] == True:
+                    writeLogger('Logger.txt', 'request')
+                    return response + value[1] + ". It's ok?"
+                else:
+                    return "My work is done, you've already eatten."
+
+            if listMeal.get('single dish')[1] in typeOfMeal:
+                value = checkDish(True,
+                                       secondCSV,
+                                       listSecondDishes,
+                                       elementSecondDishes)
+
+                secondCSV = value[0]
+
+                writing(str(date.isocalendar(date.today())[1]) + 'First.csv', firstCSV)
+                writing(str(date.isocalendar(date.today())[1]) + 'Second.csv', secondCSV)
+                writing(str(date.isocalendar(date.today())[1]) + 'Side.csv', sideCSV)
+                writing(str(date.isocalendar(date.today())[1]) + 'Fruit.csv', fruitCSV)
+
+                if value[2] == True:
+                    writeLogger('Logger.txt', 'request')
+                    return response + value[1] + ". It's ok?"
+                else:
+                    return "My work is done, you've already eatten."
+
+            if listMeal.get('single dish')[2] in typeOfMeal:
+                value = checkDish(True,
+                                       sideCSV,
+                                       listSideDishes,
+                                       elementSideDishes)
+
+                sideCSV = value[0]
+
+                writing(str(date.isocalendar(date.today())[1]) + 'First.csv', firstCSV)
+                writing(str(date.isocalendar(date.today())[1]) + 'Second.csv', secondCSV)
+                writing(str(date.isocalendar(date.today())[1]) + 'Side.csv', sideCSV)
+                writing(str(date.isocalendar(date.today())[1]) + 'Fruit.csv', fruitCSV)
+
+                if value[2] == True:
+                    writeLogger('Logger.txt', 'request')
+                    return response + value[1] + ". It's ok?"
+                else:
+                    return "My work is done, you've already eatten."
+
+            if listMeal.get('single dish')[3] in typeOfMeal:
+                value = checkDish(True,
+                                       fruitCSV,
+                                       listFruit,
+                                       elementFruit)
+
+                fruitCSV = value[0]
+
+                writing(str(date.isocalendar(date.today())[1]) + 'First.csv', firstCSV)
+                writing(str(date.isocalendar(date.today())[1]) + 'Second.csv', secondCSV)
+                writing(str(date.isocalendar(date.today())[1]) + 'Side.csv', sideCSV)
+                writing(str(date.isocalendar(date.today())[1]) + 'Fruit.csv', fruitCSV)
+
+                if value[2] == True:
+                    writeLogger('Logger.txt', 'request')
+                    return response + value[1] + ". It's ok?"
+                else:
+                    return "My work is done, you've already eatten."
+
+        if len(typeOfMeal) > 1:
+            for i in range(0, len(typeOfMeal)):
+                if listMeal.get('single dish')[0] in typeOfMeal[i]:
+                    value = checkDish(True,
+                                           firstCSV,
+                                           listFirstDishes,
+                                           elementFirstDishes)
+
+                    firstCSV = value[0]
+
+                    if value[2] == True:
+                        responseListFood.append(value[1])
+
+                if listMeal.get('single dish')[1] in typeOfMeal[i]:
+                    value = checkDish(True,
+                                           secondCSV,
+                                           listSecondDishes,
+                                           elementSecondDishes)
+
+                    secondCSV = value[0]
+
+                    if value[2] == True:
+                        responseListFood.append(value[1])
+
+                if listMeal.get('single dish')[2] in typeOfMeal[i]:
+                    value = checkDish(True,
+                                           sideCSV,
+                                           listSideDishes,
+                                           elementSideDishes)
+
+                    sideCSV = value[0]
+
+                    if value[2] == True:
+                        responseListFood.append(value[1])
+
+                if listMeal.get('single dish')[3] in typeOfMeal[i]:
+                    value = checkDish(True,
+                                           fruitCSV,
+                                           listFruit,
+                                           elementFruit)
+
+                    fruitCSV = value[0]
+
+                    if value[2] == True:
+                        responseListFood.append(value[1])
+
+        writing(str(date.isocalendar(date.today())[1])+'First.csv', firstCSV)
+        writing(str(date.isocalendar(date.today())[1])+'Second.csv', secondCSV)
+        writing(str(date.isocalendar(date.today())[1])+'Side.csv', sideCSV)
+        writing(str(date.isocalendar(date.today())[1])+'Fruit.csv', fruitCSV)
+
+        if len(responseListFood) > 0:
+            for i in range (0, len(responseListFood)):
+                if i == 0:
+                    response += responseListFood[i]
+                elif i == len(responseListFood) - 1:
+                    response += ' and ' + responseListFood[i]
+                else:
+                    response += ', ' + responseListFood[i]
+
+            writeLogger('Logger.txt', 'request')
+            return response + ". It's ok?"
+
+        return "My work is done, you've already eatten."
+
+    else:
+        return "Error"
 
 '''
     Function 'manageChangeDish' return a tuple (list, int, boolean)
@@ -563,124 +626,21 @@ def responseChange(action):
     listSideDishes = firebaseList.get('side dishes')
     listFruit = firebaseList.get('fruit')
 
-    if (action.get('parameters').get('Boolean') == 'No' and len(typeOfMeal) > 0) \
-            or (len(action.get('parameters').get('Boolean')) == 0 and len(typeOfMeal) > 0):
-        if len(typeOfMeal) == 1:
-            if listMeal.get('meal') in typeOfMeal:
-                value = checkDish(False,
-                                  firstCSV,
-                                  listFirstDishes,
-                                  None)
-
-                firstCSV = value[0]
-
-                if value[2] == True:
-                    responseListFood.append(value[1])
-
-                value = checkDish(False,
-                                       secondCSV,
-                                       listSecondDishes,
-                                       None)
-
-                secondCSV = value[0]
-
-                if value[2] == True:
-                    responseListFood.append(value[1])
-
-                value = checkDish(False,
-                                       sideCSV,
-                                       listSideDishes,
-                                       None)
-
-                sideCSV = value[0]
-
-                if value[2] == True:
-                    responseListFood.append(value[1])
-
-                value = checkDish(False,
-                                       fruitCSV,
-                                       listFruit,
-                                       None)
-
-                fruitCSV = value[0]
-
-                if value[2] == True:
-                    responseListFood.append(value[1])
-
-            if listMeal.get('single dish')[0] in typeOfMeal:
-                value = checkDish(False,
-                                       firstCSV,
-                                       listFirstDishes,
-                                       None)
-
-                firstCSV = value[0]
-
-                writing(str(date.isocalendar(date.today())[1]) + 'First.csv', firstCSV)
-
-                if value[2] == True:
-                    return response + value[1] + "."
-                else:
-                    return "My work is done, you've already eatten."
-
-            if listMeal.get('single dish')[1] in typeOfMeal:
-                value = checkDish(False,
-                                       secondCSV,
-                                       listSecondDishes,
-                                       None)
-
-                secondCSV = value[0]
-
-                writing(str(date.isocalendar(date.today())[1]) + 'Second.csv', secondCSV)
-
-                if value[2] == True:
-                    return response + value[1] + "."
-                else:
-                    return "My work is done, you've already eatten."
-
-            if listMeal.get('single dish')[2] in typeOfMeal:
-                value = checkDish(False,
-                                       sideCSV,
-                                       listSideDishes,
-                                       None)
-
-                sideCSV = value[0]
-
-                writing(str(date.isocalendar(date.today())[1]) + 'Side.csv', sideCSV)
-
-                if value[2] == True:
-                    return response + value[1] + "."
-                else:
-                    return "My work is done, you've already eatten."
-
-            if listMeal.get('single dish')[3] in typeOfMeal:
-                value = checkDish(False,
-                                     fruitCSV,
-                                     listFruit,
-                                     None)
-
-                fruitCSV = value[0]
-
-                writing(str(date.isocalendar(date.today())[1]) + 'Fruit.csv', fruitCSV)
-
-                if value[2] == True:
-                    return response + value[1] + "."
-                else:
-                    return "My work is done, you've already eatten."
-
-        if len(typeOfMeal) > 1:
-            for i in range(0, len(typeOfMeal)):
-                if listMeal.get('single dish')[0] in typeOfMeal[i]:
+    if readLogger('Logger.txt', 'no') == True:
+        if (action.get('parameters').get('Boolean') == 'No' and len(typeOfMeal) > 0) \
+                or (len(action.get('parameters').get('Boolean')) == 0 and len(typeOfMeal) > 0):
+            if len(typeOfMeal) == 1:
+                if listMeal.get('meal') in typeOfMeal:
                     value = checkDish(False,
-                                           firstCSV,
-                                           listFirstDishes,
-                                           None)
+                                      firstCSV,
+                                      listFirstDishes,
+                                      None)
 
                     firstCSV = value[0]
 
                     if value[2] == True:
                         responseListFood.append(value[1])
 
-                if listMeal.get('single dish')[1] in typeOfMeal[i]:
                     value = checkDish(False,
                                            secondCSV,
                                            listSecondDishes,
@@ -691,18 +651,75 @@ def responseChange(action):
                     if value[2] == True:
                         responseListFood.append(value[1])
 
-                if listMeal.get('single dish')[2] in typeOfMeal[i]:
                     value = checkDish(False,
-                                         sideCSV,
-                                         listSideDishes,
-                                         None)
+                                           sideCSV,
+                                           listSideDishes,
+                                           None)
 
                     sideCSV = value[0]
 
                     if value[2] == True:
                         responseListFood.append(value[1])
 
-                if listMeal.get('single dish')[3] in typeOfMeal[i]:
+                    value = checkDish(False,
+                                           fruitCSV,
+                                           listFruit,
+                                           None)
+
+                    fruitCSV = value[0]
+
+                    if value[2] == True:
+                        responseListFood.append(value[1])
+
+                if listMeal.get('single dish')[0] in typeOfMeal:
+                    value = checkDish(False,
+                                           firstCSV,
+                                           listFirstDishes,
+                                           None)
+
+                    firstCSV = value[0]
+
+                    writing(str(date.isocalendar(date.today())[1]) + 'First.csv', firstCSV)
+
+                    if value[2] == True:
+                        writeLogger('Logger.txt', 'no')
+                        return response + value[1] + "."
+                    else:
+                        return "My work is done, you've already eatten."
+
+                if listMeal.get('single dish')[1] in typeOfMeal:
+                    value = checkDish(False,
+                                           secondCSV,
+                                           listSecondDishes,
+                                           None)
+
+                    secondCSV = value[0]
+
+                    writing(str(date.isocalendar(date.today())[1]) + 'Second.csv', secondCSV)
+
+                    if value[2] == True:
+                        writeLogger('Logger.txt', 'no')
+                        return response + value[1] + "."
+                    else:
+                        return "My work is done, you've already eatten."
+
+                if listMeal.get('single dish')[2] in typeOfMeal:
+                    value = checkDish(False,
+                                           sideCSV,
+                                           listSideDishes,
+                                           None)
+
+                    sideCSV = value[0]
+
+                    writing(str(date.isocalendar(date.today())[1]) + 'Side.csv', sideCSV)
+
+                    if value[2] == True:
+                        writeLogger('Logger.txt', 'no')
+                        return response + value[1] + "."
+                    else:
+                        return "My work is done, you've already eatten."
+
+                if listMeal.get('single dish')[3] in typeOfMeal:
                     value = checkDish(False,
                                          fruitCSV,
                                          listFruit,
@@ -710,29 +727,81 @@ def responseChange(action):
 
                     fruitCSV = value[0]
 
+                    writing(str(date.isocalendar(date.today())[1]) + 'Fruit.csv', fruitCSV)
+
                     if value[2] == True:
-                        responseListFood.append(value[1])
+                        writeLogger('Logger.txt', 'no')
+                        return response + value[1] + "."
+                    else:
+                        return "My work is done, you've already eatten."
 
-        writing(str(date.isocalendar(date.today())[1]) + 'First.csv', firstCSV)
-        writing(str(date.isocalendar(date.today())[1]) + 'Second.csv', secondCSV)
-        writing(str(date.isocalendar(date.today())[1]) + 'Side.csv', sideCSV)
-        writing(str(date.isocalendar(date.today())[1]) + 'Fruit.csv', fruitCSV)
+            if len(typeOfMeal) > 1:
+                for i in range(0, len(typeOfMeal)):
+                    if listMeal.get('single dish')[0] in typeOfMeal[i]:
+                        value = checkDish(False,
+                                               firstCSV,
+                                               listFirstDishes,
+                                               None)
 
-        if len(responseListFood) > 0:
-            for i in range(0, len(responseListFood)):
-                if i == 0:
-                    response += responseListFood[i]
-                elif i == len(responseListFood) - 1:
-                    response += ' and ' + responseListFood[i]
-                else:
-                    response += ', ' + responseListFood[i]
+                        firstCSV = value[0]
 
-            return response + "."
+                        if value[2] == True:
+                            responseListFood.append(value[1])
 
-    elif (action.get('parameters').get('Boolean') == 'No' and len(typeOfMeal) == 0):
-        return "Can you tell me what do you change?"
-    elif (action.get('parameters').get('Boolean') == 'Yes' and len(typeOfMeal) == 0):
-        return "Enjoy your meal!"
+                    if listMeal.get('single dish')[1] in typeOfMeal[i]:
+                        value = checkDish(False,
+                                               secondCSV,
+                                               listSecondDishes,
+                                               None)
+
+                        secondCSV = value[0]
+
+                        if value[2] == True:
+                            responseListFood.append(value[1])
+
+                    if listMeal.get('single dish')[2] in typeOfMeal[i]:
+                        value = checkDish(False,
+                                             sideCSV,
+                                             listSideDishes,
+                                             None)
+
+                        sideCSV = value[0]
+
+                        if value[2] == True:
+                            responseListFood.append(value[1])
+
+                    if listMeal.get('single dish')[3] in typeOfMeal[i]:
+                        value = checkDish(False,
+                                             fruitCSV,
+                                             listFruit,
+                                             None)
+
+                        fruitCSV = value[0]
+
+                        if value[2] == True:
+                            responseListFood.append(value[1])
+
+            writing(str(date.isocalendar(date.today())[1]) + 'First.csv', firstCSV)
+            writing(str(date.isocalendar(date.today())[1]) + 'Second.csv', secondCSV)
+            writing(str(date.isocalendar(date.today())[1]) + 'Side.csv', sideCSV)
+            writing(str(date.isocalendar(date.today())[1]) + 'Fruit.csv', fruitCSV)
+
+            if len(responseListFood) > 0:
+                for i in range(0, len(responseListFood)):
+                    if i == 0:
+                        response += responseListFood[i]
+                    elif i == len(responseListFood) - 1:
+                        response += ' and ' + responseListFood[i]
+                    else:
+                        response += ', ' + responseListFood[i]
+
+                writeLogger('Logger.txt', 'no')
+                return response + "."
+
+        elif (action.get('parameters').get('Boolean') == 'No' and len(typeOfMeal) == 0):
+            return "Can you tell me what do you change?"
+        elif (action.get('parameters').get('Boolean') == 'Yes' and len(typeOfMeal) == 0):
+            return "Enjoy your meal!"
 
     return "My work is done, you've already eatten."
 
@@ -782,50 +851,56 @@ def reminder(action):
     listSideDishes = firebaseList.get('side dishes')
     listFruit = firebaseList.get('fruit')
 
-    if len(firstCSV) > 0:
-        value = checkReminder(firstCSV,
-                              listFirstDishes)
+    if readLogger('Logger.txt', 'reminder'):
+        if len(firstCSV) > 0:
+            value = checkReminder(firstCSV,
+                                  listFirstDishes)
 
-        if value != (None, False):
-            responseListFood.append(value[0])
+            if value != (None, False):
+                responseListFood.append(value[0])
 
-    if len(secondCSV) > 0:
-        value = checkReminder(secondCSV,
-                              listSecondDishes)
+        if len(secondCSV) > 0:
+            value = checkReminder(secondCSV,
+                                  listSecondDishes)
 
-        if value != (None, False):
-            responseListFood.append(value[0])
+            if value != (None, False):
+                responseListFood.append(value[0])
 
-    if len(sideCSV) > 0:
-        value = checkReminder(sideCSV,
-                              listSideDishes)
+        if len(sideCSV) > 0:
+            value = checkReminder(sideCSV,
+                                  listSideDishes)
 
-        if value != (None, False):
-            responseListFood.append(value[0])
+            if value != (None, False):
+                responseListFood.append(value[0])
 
-    if len(fruitCSV) > 0:
-        value = checkReminder(fruitCSV,
-                              listFruit)
+        if len(fruitCSV) > 0:
+            value = checkReminder(fruitCSV,
+                                  listFruit)
 
-        if value != (None, False):
-            responseListFood.append(value[0])
+            if value != (None, False):
+                responseListFood.append(value[0])
 
-    if len(responseListFood) == 0:
-        return "You can't get this information"
+        if len(responseListFood) == 0:
+            return "You can't get this information"
 
-    elif len(responseListFood) == 1:
-        return response + responseListFood[0]
+        elif len(responseListFood) == 1:
+            writeLogger('Logger.txt', 'reminder')
+            return response + responseListFood[0]
 
-    elif len(responseListFood) > 1:
-        for i in range(0, len(responseListFood)):
-            if i == 0:
-                response += responseListFood[i]
-            elif i == len(responseListFood) - 1:
-                response += ' and ' + responseListFood[i]
-            else:
-                response += ', ' + responseListFood[i]
+        elif len(responseListFood) > 1:
+            for i in range(0, len(responseListFood)):
+                if i == 0:
+                    response += responseListFood[i]
+                elif i == len(responseListFood) - 1:
+                    response += ' and ' + responseListFood[i]
+                else:
+                    response += ', ' + responseListFood[i]
 
-        return response + "."
+            writeLogger('Logger.txt', 'reminder')
+            return response + "."
+
+    else:
+        return "Error"
 
 # run the app
 if __name__ == '__main__':
