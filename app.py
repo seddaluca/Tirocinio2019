@@ -73,6 +73,8 @@ listMeal = {'meal': 'meal',
 listAction = {
     'request': ['request', 'no', 'reminder'],
     'no': ['reminder', 'request'],
+    'yes': ['request', 'reminder'],
+    'change': ['no', 'request', 'reminder'],
     'reminder': ['reminder', 'request']
 }
 
@@ -133,7 +135,7 @@ def reading(file):
         return list
 
     except FileNotFoundError:
-        print()
+        ""
 
     return []
 
@@ -157,12 +159,17 @@ def readLogger(file, action):
     try:  # file esiste
         try:  # file esiste e contiene minimo una riga
             dataset = pd.read_csv(file, sep=",", error_bad_lines=False)  # Leggo tutto il file
-            index = len(dataset.index) - 1
+            try:
+                index = len(dataset.index) - 1
 
-            if action in listAction.get(dataset.iloc[index]['Action']):
-                return True
-            else:
-                return False
+                if action in listAction.get(dataset.iloc[index]['Action']):
+                    return True
+                else:
+                    return False
+
+            except IndexError:
+                if action == 'request':
+                    return True
 
         except pd.errors.EmptyDataError:  # eccezione nel caso il file sia vuoto
             if action == 'request':
@@ -173,6 +180,16 @@ def readLogger(file, action):
             return True
 
     return False
+
+def errorBoolean(file):
+    dataset = pd.read_csv(file, sep=",", error_bad_lines=False)  # Leggo tutto il file
+
+    index = len(dataset.index) - 1
+
+    if 'change' == dataset.iloc[index]['Action']:
+        return False
+    else:
+        return True
 
 '''
     Function 'writing'
@@ -642,9 +659,9 @@ def responseChange(action):
                         responseListFood.append(value[1])
 
                     value = checkDish(False,
-                                           secondCSV,
-                                           listSecondDishes,
-                                           None)
+                                      secondCSV,
+                                      listSecondDishes,
+                                      None)
 
                     secondCSV = value[0]
 
@@ -652,9 +669,9 @@ def responseChange(action):
                         responseListFood.append(value[1])
 
                     value = checkDish(False,
-                                           sideCSV,
-                                           listSideDishes,
-                                           None)
+                                      sideCSV,
+                                      listSideDishes,
+                                      None)
 
                     sideCSV = value[0]
 
@@ -662,9 +679,9 @@ def responseChange(action):
                         responseListFood.append(value[1])
 
                     value = checkDish(False,
-                                           fruitCSV,
-                                           listFruit,
-                                           None)
+                                      fruitCSV,
+                                      listFruit,
+                                      None)
 
                     fruitCSV = value[0]
 
@@ -673,9 +690,9 @@ def responseChange(action):
 
                 if listMeal.get('single dish')[0] in typeOfMeal:
                     value = checkDish(False,
-                                           firstCSV,
-                                           listFirstDishes,
-                                           None)
+                                      firstCSV,
+                                      listFirstDishes,
+                                      None)
 
                     firstCSV = value[0]
 
@@ -689,9 +706,9 @@ def responseChange(action):
 
                 if listMeal.get('single dish')[1] in typeOfMeal:
                     value = checkDish(False,
-                                           secondCSV,
-                                           listSecondDishes,
-                                           None)
+                                      secondCSV,
+                                      listSecondDishes,
+                                      None)
 
                     secondCSV = value[0]
 
@@ -705,9 +722,9 @@ def responseChange(action):
 
                 if listMeal.get('single dish')[2] in typeOfMeal:
                     value = checkDish(False,
-                                           sideCSV,
-                                           listSideDishes,
-                                           None)
+                                      sideCSV,
+                                      listSideDishes,
+                                      None)
 
                     sideCSV = value[0]
 
@@ -721,9 +738,9 @@ def responseChange(action):
 
                 if listMeal.get('single dish')[3] in typeOfMeal:
                     value = checkDish(False,
-                                         fruitCSV,
-                                         listFruit,
-                                         None)
+                                      fruitCSV,
+                                      listFruit,
+                                      None)
 
                     fruitCSV = value[0]
 
@@ -739,9 +756,9 @@ def responseChange(action):
                 for i in range(0, len(typeOfMeal)):
                     if listMeal.get('single dish')[0] in typeOfMeal[i]:
                         value = checkDish(False,
-                                               firstCSV,
-                                               listFirstDishes,
-                                               None)
+                                          firstCSV,
+                                          listFirstDishes,
+                                          None)
 
                         firstCSV = value[0]
 
@@ -750,9 +767,9 @@ def responseChange(action):
 
                     if listMeal.get('single dish')[1] in typeOfMeal[i]:
                         value = checkDish(False,
-                                               secondCSV,
-                                               listSecondDishes,
-                                               None)
+                                          secondCSV,
+                                          listSecondDishes,
+                                          None)
 
                         secondCSV = value[0]
 
@@ -761,9 +778,9 @@ def responseChange(action):
 
                     if listMeal.get('single dish')[2] in typeOfMeal[i]:
                         value = checkDish(False,
-                                             sideCSV,
-                                             listSideDishes,
-                                             None)
+                                          sideCSV,
+                                          listSideDishes,
+                                          None)
 
                         sideCSV = value[0]
 
@@ -772,9 +789,9 @@ def responseChange(action):
 
                     if listMeal.get('single dish')[3] in typeOfMeal[i]:
                         value = checkDish(False,
-                                             fruitCSV,
-                                             listFruit,
-                                             None)
+                                          fruitCSV,
+                                          listFruit,
+                                          None)
 
                         fruitCSV = value[0]
 
@@ -798,9 +815,12 @@ def responseChange(action):
                 writeLogger('Logger.txt', 'no')
                 return response + "."
 
-        elif (action.get('parameters').get('Boolean') == 'No' and len(typeOfMeal) == 0):
+        elif (action.get('parameters').get('Boolean') == 'No' and len(typeOfMeal) == 0 and errorBoolean('Logger.txt') == True):
+            writeLogger('Logger.txt', 'change')
             return "Can you tell me what do you change?"
-        elif (action.get('parameters').get('Boolean') == 'Yes' and len(typeOfMeal) == 0):
+
+        elif (action.get('parameters').get('Boolean') == 'Yes' and len(typeOfMeal) == 0 and errorBoolean('Logger.txt') == True):
+            writeLogger('Logger.txt', 'yes')
             return "Enjoy your meal!"
 
     return "My work is done, you've already eatten."
