@@ -64,9 +64,9 @@ responseList = ['I suggest you ',
                     'I recommend you ']
 
 listMeal = {'meal': 'meal',
-            'single dish': ['first',
-                            'second',
-                            'side dish',
+            'single dish': ['first course',
+                            'second course',
+                            'side course',
                             'fruit']
             } # lista di supporto per suddividere le tipologie di pasti
 
@@ -328,6 +328,8 @@ def response(action):
         responseListFood  = []
 
         typeOfMeal = action.get('parameters').get('TypeOfMeal')
+
+        typeOfMeal = list(dict.fromkeys(typeOfMeal))
 
         response = responseList[random.randint(0, 1)]  # imposto la risposta di default
 
@@ -630,6 +632,8 @@ def responseChange(action):
     responseListFood = []
 
     typeOfMeal = action.get('parameters').get('TypeOfMeal')
+
+    typeOfMeal = list(dict.fromkeys(typeOfMeal))
 
     response = responseList[random.randint(0, 1)]  # imposto la risposta di default
 
