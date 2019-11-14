@@ -118,7 +118,7 @@ def reading(file):
     list = []
 
     try:
-        with open('/Users/lucasedda/Desktop/Tirocinio/cvs/'+file, newline='') as f:
+        with open('/Users/lucasedda/Desktop/Tirocinio/csv/'+file, newline='') as f:
             reader = csv.reader(f)
             i = -1
             for row in reader:
@@ -198,11 +198,11 @@ def errorBoolean(file):
 '''
 def writing(name, list):
     try:
-        os.mkdir('/Users/lucasedda/Desktop/Tirocinio/cvs')
+        os.mkdir('/Users/lucasedda/Desktop/Tirocinio/csv')
     except OSError:
         ""
 
-    with open('/Users/lucasedda/Desktop/Tirocinio/cvs/'+name, 'w', newline='') as f:
+    with open('/Users/lucasedda/Desktop/Tirocinio/csv/'+name, 'w', newline='') as f:
         writer = csv.writer(f)
         writer.writerow(["ID", "Take", "Last"])
         for i in range(0, len(list)):
@@ -318,7 +318,7 @@ def manageDish(listCSV, listFood, obj):
 '''
 def response(action):
     try:
-        os.mkdir('/Users/lucasedda/Desktop/Tirocinio/cvs')
+        os.mkdir('/Users/lucasedda/Desktop/Tirocinio/csv')
     except OSError:
         ""
 
