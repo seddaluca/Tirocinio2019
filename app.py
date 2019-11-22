@@ -863,7 +863,7 @@ def checkReminder(listCSV, listFood):
 def reminder(action):
     responseListFood = []
 
-    response = "You ate in your last meal "
+    response = "Your last meal was "
 
     firstCSV = reading(str(date.isocalendar(date.today())[1]) + 'First.csv')
     secondCSV = reading(str(date.isocalendar(date.today())[1]) + 'Second.csv')
